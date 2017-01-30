@@ -152,4 +152,8 @@ describe("A Columns", function () {
     expect(new Backgrid.Columns().model).toBe(Backgrid.Column);
   });
 
+  it("has access to Backbone.PageableCollection", function () {
+    expect(typeof Backbone.PageableCollection).toBe('function');
+  });
+
 });

@@ -9,11 +9,10 @@ import {
 } from './column.js';
 /**
    A Backbone collection of Column instances.
-
    @class Backgrid.Columns
    @extends Backbone.Collection
  */
-var Columns = Backbone.PageableCollection.extend({
+var Columns = Backgrid.Columns = Backbone.Collection.extend({
 
 	/**
 	   @property {Backgrid.Column} model
