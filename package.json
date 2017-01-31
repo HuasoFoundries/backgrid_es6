@@ -1,6 +1,6 @@
 {
   "name": "ig_backbone",
-  "version": "17.0.2",
+  "version": "17.0.3",
   "description": "Librerías Backbone y Backgrid como módulos ES6, con sus plugins",
   "author": "Felipe Figueroa  <amenadiel@gmail.com>",
   "contributors": [
@@ -57,7 +57,7 @@
     "format": "amd",
     "dependencies": {
       "backbone": "github:huasofoundries/backbone_es6@^17",
-      "plugin-babel": "npm:systemjs-plugin-babel@^0.0.19"
+      "plugin-babel": "npm:systemjs-plugin-babel@^0.0.20"
     },
     "devDependencies": {
       "babel-plugin-transform-es2015-unicode-regex": "npm:babel-plugin-transform-es2015-unicode-regex@^6.11.0",

@@ -355,17 +355,17 @@ SystemJS.config({
     "github:*/*.json"
   ],
   map: {
-    "backbone": "github:huasofoundries/backbone_es6@17.0.1",
-    "plugin-babel": "npm:systemjs-plugin-babel@0.0.19",
+    "plugin-babel": "npm:systemjs-plugin-babel@0.0.20",
+    "backbone": "github:huasofoundries/backbone_es6@17.0.3",
     "css": "github:systemjs/plugin-css@0.1.32",
     "json": "github:systemjs/plugin-json@0.1.2",
     "less": "npm:systemjs-less-plugin@1.9.1",
     "text": "github:systemjs/plugin-text@0.0.7"
   },
   packages: {
-    "github:huasofoundries/backbone_es6@17.0.1": {
+    "github:huasofoundries/backbone_es6@17.0.3": {
       "map": {
-        "plugin-babel": "npm:systemjs-plugin-babel@0.0.19"
+        "plugin-babel": "npm:systemjs-plugin-babel@0.0.20"
       }
     }
   }
