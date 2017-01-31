@@ -56,8 +56,7 @@
     "main": "dist/ig_backbone.bundle.js",
     "format": "amd",
     "dependencies": {
-      "backbone": "github:huasofoundries/backbone_es6@^17",
-      "plugin-babel": "npm:systemjs-plugin-babel@^0.0.20"
+      "backbone": "github:huasofoundries/backbone_es6@^17"
     },
     "devDependencies": {
       "babel-plugin-transform-es2015-unicode-regex": "npm:babel-plugin-transform-es2015-unicode-regex@^6.11.0",
@@ -75,6 +74,7 @@
       "css": "github:systemjs/plugin-css@^0.1",
       "json": "github:systemjs/plugin-json@^0.1",
       "less": "npm:systemjs-less-plugin@^2",
+      "plugin-babel": "npm:systemjs-plugin-babel@^0.0.20",
       "text": "github:systemjs/plugin-text@^0.0.7"
     },
     "overrides": {
