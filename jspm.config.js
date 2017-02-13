@@ -15,38 +15,14 @@ SystemJS.config({
   },
   devConfig: {
     "map": {
-      "babel-plugin-transform-es2015-unicode-regex": "npm:babel-plugin-transform-es2015-unicode-regex@6.11.0",
-      "babel-plugin-transform-object-assign": "npm:babel-plugin-transform-object-assign@6.8.0",
-      "babel-plugin-transform-merge-sibling-variables": "npm:babel-plugin-transform-merge-sibling-variables@6.8.0",
+      "babel-plugin-transform-es2015-unicode-regex": "npm:babel-plugin-transform-es2015-unicode-regex@6.22.0",
+      "babel-plugin-transform-object-assign": "npm:babel-plugin-transform-object-assign@6.22.0",
+      "babel-plugin-transform-merge-sibling-variables": "npm:babel-plugin-transform-merge-sibling-variables@6.8.2",
       "fs": "npm:jspm-nodelibs-fs@0.2.0",
       "path": "npm:jspm-nodelibs-path@0.2.1",
       "process": "npm:jspm-nodelibs-process@0.2.0"
     },
     "packages": {
-      "npm:babel-plugin-transform-es2015-unicode-regex@6.11.0": {
-        "map": {
-          "babel-helper-regex": "npm:babel-helper-regex@6.18.0",
-          "regexpu-core": "npm:regexpu-core@2.0.0",
-          "babel-runtime": "npm:babel-runtime@6.20.0"
-        }
-      },
-      "npm:babel-plugin-transform-object-assign@6.8.0": {
-        "map": {
-          "babel-runtime": "npm:babel-runtime@6.20.0"
-        }
-      },
-      "npm:babel-plugin-transform-merge-sibling-variables@6.8.0": {
-        "map": {
-          "babel-runtime": "npm:babel-runtime@6.20.0"
-        }
-      },
-      "npm:babel-helper-regex@6.18.0": {
-        "map": {
-          "babel-runtime": "npm:babel-runtime@6.20.0",
-          "babel-types": "npm:babel-types@6.21.0",
-          "lodash": "npm:lodash@4.17.4"
-        }
-      },
       "npm:regexpu-core@2.0.0": {
         "map": {
           "regjsgen": "npm:regjsgen@0.2.0",
@@ -59,18 +35,37 @@ SystemJS.config({
           "jsesc": "npm:jsesc@0.5.0"
         }
       },
-      "npm:babel-runtime@6.20.0": {
+      "npm:babel-plugin-transform-es2015-unicode-regex@6.22.0": {
         "map": {
-          "regenerator-runtime": "npm:regenerator-runtime@0.10.1",
-          "core-js": "npm:core-js@2.4.1"
+          "babel-helper-regex": "npm:babel-helper-regex@6.22.0",
+          "babel-runtime": "npm:babel-runtime@6.22.0",
+          "regexpu-core": "npm:regexpu-core@2.0.0"
         }
       },
-      "npm:babel-types@6.21.0": {
+      "npm:babel-plugin-transform-object-assign@6.22.0": {
         "map": {
-          "babel-runtime": "npm:babel-runtime@6.20.0",
+          "babel-runtime": "npm:babel-runtime@6.22.0"
+        }
+      },
+      "npm:babel-helper-regex@6.22.0": {
+        "map": {
+          "babel-runtime": "npm:babel-runtime@6.22.0",
+          "babel-types": "npm:babel-types@6.22.0",
+          "lodash": "npm:lodash@4.17.4"
+        }
+      },
+      "npm:babel-runtime@6.22.0": {
+        "map": {
+          "core-js": "npm:core-js@2.4.1",
+          "regenerator-runtime": "npm:regenerator-runtime@0.10.1"
+        }
+      },
+      "npm:babel-types@6.22.0": {
+        "map": {
+          "babel-runtime": "npm:babel-runtime@6.22.0",
           "lodash": "npm:lodash@4.17.4",
-          "esutils": "npm:esutils@2.0.2",
-          "to-fast-properties": "npm:to-fast-properties@1.0.2"
+          "to-fast-properties": "npm:to-fast-properties@1.0.2",
+          "esutils": "npm:esutils@2.0.2"
         }
       }
     }
@@ -355,17 +350,17 @@ SystemJS.config({
     "github:*/*.json"
   ],
   map: {
-    "plugin-babel": "npm:systemjs-plugin-babel@0.0.20",
-    "backbone": "github:huasofoundries/backbone_es6@17.0.3",
+    "json": "github:systemjs/plugin-json@0.3.0",
+    "plugin-babel": "npm:systemjs-plugin-babel@0.0.21",
+    "backbone": "github:huasofoundries/backbone_es6@17.0.4",
     "css": "github:systemjs/plugin-css@0.1.32",
-    "json": "github:systemjs/plugin-json@0.1.2",
-    "less": "npm:systemjs-less-plugin@1.9.1",
+    "less": "npm:systemjs-less-plugin@2.0.0",
     "text": "github:systemjs/plugin-text@0.0.7"
   },
   packages: {
-    "github:huasofoundries/backbone_es6@17.0.3": {
+    "npm:systemjs-less-plugin@2.0.0": {
       "map": {
-        "plugin-babel": "npm:systemjs-plugin-babel@0.0.20"
+        "css": "github:systemjs/plugin-css@0.1.32"
       }
     }
   }
