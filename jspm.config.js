@@ -13,68 +13,17 @@ SystemJS.config({
   },
   devConfig: {
     "map": {
-      "babel-plugin-transform-es2015-unicode-regex": "npm:babel-plugin-transform-es2015-unicode-regex@6.22.0",
-      "babel-plugin-transform-object-assign": "npm:babel-plugin-transform-object-assign@6.22.0",
-      "babel-plugin-transform-merge-sibling-variables": "npm:babel-plugin-transform-merge-sibling-variables@6.8.2",
       "fs": "npm:jspm-nodelibs-fs@0.2.0",
       "path": "npm:jspm-nodelibs-path@0.2.1",
       "process": "npm:jspm-nodelibs-process@0.2.0"
-    },
-    "packages": {
-      "npm:regexpu-core@2.0.0": {
-        "map": {
-          "regjsgen": "npm:regjsgen@0.2.0",
-          "regenerate": "npm:regenerate@1.3.2",
-          "regjsparser": "npm:regjsparser@0.1.5"
-        }
-      },
-      "npm:regjsparser@0.1.5": {
-        "map": {
-          "jsesc": "npm:jsesc@0.5.0"
-        }
-      },
-      "npm:babel-plugin-transform-es2015-unicode-regex@6.22.0": {
-        "map": {
-          "babel-helper-regex": "npm:babel-helper-regex@6.22.0",
-          "babel-runtime": "npm:babel-runtime@6.22.0",
-          "regexpu-core": "npm:regexpu-core@2.0.0"
-        }
-      },
-      "npm:babel-plugin-transform-object-assign@6.22.0": {
-        "map": {
-          "babel-runtime": "npm:babel-runtime@6.22.0"
-        }
-      },
-      "npm:babel-helper-regex@6.22.0": {
-        "map": {
-          "babel-runtime": "npm:babel-runtime@6.22.0",
-          "babel-types": "npm:babel-types@6.22.0",
-          "lodash": "npm:lodash@4.17.4"
-        }
-      },
-      "npm:babel-runtime@6.22.0": {
-        "map": {
-          "core-js": "npm:core-js@2.4.1",
-          "regenerator-runtime": "npm:regenerator-runtime@0.10.1"
-        }
-      },
-      "npm:babel-types@6.22.0": {
-        "map": {
-          "babel-runtime": "npm:babel-runtime@6.22.0",
-          "lodash": "npm:lodash@4.17.4",
-          "to-fast-properties": "npm:to-fast-properties@1.0.2",
-          "esutils": "npm:esutils@2.0.2"
-        }
-      }
     }
   },
   transpiler: "plugin-babel",
-  "paths": {
+  paths: {
     "jquery": "test/vendor/jquery.js",
-    "underscore": "test/vendor/underscore.js",
+    "underscore": "test/vendor/underscore.js"
   },
-
-  "meta": {
+  meta: {
     "dist/**/*.js": {
       "build": false
     },
@@ -377,8 +326,8 @@ SystemJS.config({
     "github:*/*.json"
   ],
   map: {
+    "plugin-babel": "npm:systemjs-plugin-babel@0.0.25",
     "json": "github:systemjs/plugin-json@0.3.0",
-    "plugin-babel": "npm:systemjs-plugin-babel@0.0.21",
     "backbone": "github:huasofoundries/backbone_es6@17.0.4",
     "css": "github:systemjs/plugin-css@0.1.32",
     "less": "npm:systemjs-less-plugin@2.0.0",
