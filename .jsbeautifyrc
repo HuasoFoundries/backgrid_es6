@@ -7,7 +7,8 @@
     // Details: https://github.com/victorporof/Sublime-HTMLPrettify#using-your-own-jsbeautifyrc-options
     // Documentation: https://github.com/einars/js-beautify/
 
-    "html": {
+    "html":
+    {
         "allowed_file_extensions": ["htm", "html", "xhtml", "shtml", "xml", "svg", "twig", "hbs"],
         "brace_style": "collapse", // [collapse|expand|end-expand|none] Put braces on the same line as control statements (default), or put braces on own line (Allman / ANSI style), or just put end braces on own line, or attempt to keep them where they are
         "end_with_newline": false, // End output with newline
@@ -24,7 +25,8 @@
         ], // List of tags that should not be reformatted
         "wrap_line_length": 0 // Lines should wrap at next opportunity after this number of characters (0 disables)
     },
-    "css": {
+    "css":
+    {
         "allowed_file_extensions": ["css", "scss", "sass", "less"],
         "end_with_newline": false, // End output with newline
         "indent_char": " ", // Indentation character
@@ -34,11 +36,12 @@
         "selector_separator_newline": true, // Separate selectors with newline or not (e.g. "a,\nbr" or "a, br"),
         "indent_with_tabs": true
     },
-    "js": {
-        "indent_size": 4,
+    "js":
+    {
+        "indent_size": 2,
         "indent_char": " ",
         "indent_level": 0,
-        "indent_with_tabs": true,
+        "indent_with_tabs": false,
         "preserve_newlines": true,
         "max_preserve_newlines": 2,
         "jslint_happy": true,
@@ -51,6 +54,22 @@
         "eval_code": false,
         "unescape_strings": false,
         "wrap_line_length": 180
-    }
+    },
+    "json":
+    {
+        // Rules added here apply only to JSON files. They take precedence over all
+        // of the settings in the 'all' category above.
+
+        // You can add other .jsbeautifyrc rules in this section too.
+
+        // [collapse|collapse-preserve-inline|expand|end-expand|none] Put braces on the same line as control statements (default), or put braces on own line (Allman / ANSI style), or put end braces on own line, or attempt to keep them where they are
+        "brace_style": "collapse-preserve-inline",
+
+        // Preserve array indentation
+        "keep_array_indentation": false,
+
+        // Should printable characters in strings encoded in \xNN notation be unescaped, "example" vs "\x65\x78\x61\x6d\x70\x6c\x65"
+        "unescape_strings": false
+    },
 
 }

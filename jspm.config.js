@@ -2,15 +2,13 @@ SystemJS.config({
   browserConfig: {
     "paths": {
       "npm:": "/jspm_packages/npm/",
-      "github:": "/jspm_packages/github/",
-      "ig_backbone/": "/src/"
+      "github:": "/jspm_packages/github/"
     }
   },
   nodeConfig: {
     "paths": {
       "npm:": "jspm_packages/npm/",
-      "github:": "jspm_packages/github/",
-      "ig_backbone/": "src/"
+      "github:": "jspm_packages/github/"
     }
   },
   devConfig: {
@@ -71,9 +69,38 @@ SystemJS.config({
     }
   },
   transpiler: "plugin-babel",
+  "paths": {
+    "jquery": "test/vendor/jquery.js",
+    "underscore": "test/vendor/underscore.js",
+  },
+
+  "meta": {
+    "dist/**/*.js": {
+      "build": false
+    },
+    "dist/*.js": {
+      "build": false
+    },
+    "test/vendor/*": {
+      "build": false
+    }
+  },
   packages: {
-    "ig_backbone": {
+    "src/ig_backgrid": {
+      "main": "ig_backgrid.js",
+      "map": {
+        "backgrid": "./backgrid.es6.js"
+      },
+      "defaultExtension": false,
+      "meta": {
+        "*.js": {
+          "loader": "plugin-babel"
+        }
+      }
+    },
+    "src/ig_backbone": {
       "main": "ig_backbone.js",
+      "defaultExtension": false,
       "meta": {
         "*.js": {
           "loader": "plugin-babel"

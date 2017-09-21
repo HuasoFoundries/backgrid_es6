@@ -3,10 +3,10 @@ VERSION = $(shell cat package.json | sed -n 's/.*"version": "\([^"]*\)",/\1/p')
 SHELL = /usr/bin/env bash
 
 default: build
-.PHONY: ig_backbone ig_backgrid test build ig_backbone_bundle ig_backgrid_bundle
+.PHONY: ig_backbone ig_backgrid test build ig_backbone_bundle ig_backgrid_bundle backbone backgrid backgrid_mini
 
  
-build: ig_backbone ig_backgrid ig_backbone_bundle ig_backgrid_bundle
+build: backbone backgrid
 
 version:
 	@echo $(VERSION)
@@ -19,25 +19,36 @@ install:
 test:
 	grunt karma
 
- 
+backbone: 	ig_backbone 	ig_backbone_bundle
+
+backgrid: 	ig_backgrid 	ig_backgrid_bundle
 
 ig_backbone:
-	jspm build ig_backbone dist/ig_backbone.js --format esm --skip-source-maps --skip-encode-names --config jspm.build.esm.json --global-deps '{"jquery":"$$", "underscore":"_"}'
+	jspm build src/ig_backbone dist/ig_backbone.js --format esm --skip-source-maps --skip-encode-names
 
 ig_backbone_bundle:	
-	jspm build ig_backbone dist/ig_backbone.bundle.js --format umd --skip-encode-names --global-name IGBackbone --config jspm.build.amd.json 
+	jspm build src/ig_backbone dist/ig_backbone.bundle.js --format umd --skip-encode-names --global-name window 
 
 	
 	
 ig_backgrid:
-	jspm build ig_backbone/ig_backgrid.js dist/ig_backgrid.js --format esm --skip-source-maps --skip-encode-names --config jspm.backgrid.esm.json --global-deps '{"jquery":"$$", "underscore":"_", "backbone":"IGBackbone"}'
+	jspm build src/ig_backgrid dist/ig_backgrid.js --format esm --skip-source-maps --skip-encode-names  --config jspm.backgrid.amd.json  --global-deps '{"backbone":"Backbone"}' 
 
 ig_backgrid_bundle:	
-	jspm build ig_backbone/ig_backgrid.js dist/ig_backgrid.bundle.js  --format umd --skip-encode-names --global-name IGBackgrid --config jspm.backgrid.amd.json  --global-deps '{"jquery":"$$", "underscore":"_", "backbone":"IGBackbone"}' 
-	
+	jspm build src/ig_backgrid dist/ig_backgrid.bundle.js  --format umd --skip-encode-names --global-name window --config jspm.backgrid.amd.json  --global-deps '{"backbone":"Backbone"}' 
+
 
  
 update_version:
+ifeq ($(shell expr "${VERSION}" \> "$(v)"),1)
+	$(error "v" parameter is lower than current version ${VERSION})
+endif
+ifeq ($(v),)
+	$(error v is undefined)
+endif
+ifeq (${VERSION},$(v))
+	$(error v is already the current version)
+endif
 	@echo "Current version is " ${VERSION}
 	@echo "Next version is " $(v)
 	sed -i s/"$(VERSION)"/"$(v)"/g package.json
