@@ -690,11 +690,11 @@
     "deps": {},
     "peerDeps": {}
   },
-  "npm:systemjs-plugin-babel@0.0.21": {
+  "github:systemjs/plugin-json@0.3.0": {
     "deps": {},
     "peerDeps": {}
   },
-  "github:systemjs/plugin-json@0.3.0": {
+  "npm:systemjs-plugin-babel@0.0.21": {
     "deps": {},
     "peerDeps": {}
   }
