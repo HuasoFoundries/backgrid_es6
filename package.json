@@ -1,10 +1,9 @@
 {
   "name": "ig_backbone",
-  "version": "17.1.5",
+  "version": "17.1.6",
   "description": "Backbone and Backgrid as ES6 modules, with bundled plugins and extensions",
   "author": "Felipe Figueroa  <amenadiel@gmail.com>",
-  "contributors": [
-    {
+  "contributors": [{
       "name": "José Salazar",
       "email": "jolsalazar@gmail.com",
       "role": "Senior Developer"
@@ -52,7 +51,7 @@
   },
   "jspm": {
     "registry": "jspm",
-    "main": "dist/ig_backbone.bundle.js",
+    "main": "ig_backbone.bundle.js",
     "format": "amd",
     "directories": {
       "lib": "dist"
