@@ -567,12 +567,6 @@
     },
     "peerDeps": {}
   },
-  "github:huasofoundries/backbone_es6@17.0.4": {
-    "deps": {},
-    "peerDeps": {
-      "plugin-babel": "npm:systemjs-plugin-babel@^0.0.20"
-    }
-  },
   "npm:jspm-nodelibs-path@0.2.1": {
     "deps": {},
     "peerDeps": {
@@ -598,6 +592,12 @@
   "github:systemjs/plugin-json@0.3.0": {
     "deps": {},
     "peerDeps": {}
+  },
+  "github:huasofoundries/backbone_es6@17.0.6": {
+    "deps": {},
+    "peerDeps": {
+      "plugin-babel": "npm:systemjs-plugin-babel@^0.0.25"
+    }
   },
   "npm:systemjs-plugin-babel@0.0.25": {
     "deps": {},
