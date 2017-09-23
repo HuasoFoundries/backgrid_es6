@@ -1,9 +1,10 @@
 {
   "name": "ig_backbone",
-  "version": "17.1.4",
+  "version": "17.1.5",
   "description": "Backbone and Backgrid as ES6 modules, with bundled plugins and extensions",
   "author": "Felipe Figueroa  <amenadiel@gmail.com>",
-  "contributors": [{
+  "contributors": [
+    {
       "name": "José Salazar",
       "email": "jolsalazar@gmail.com",
       "role": "Senior Developer"
@@ -33,11 +34,14 @@
   "main": "dist/ig_backbone.bundle.js",
   "jsnext:main": "dist/ig_backbone.js",
   "private": true,
-  "dependencies": {
+  "dependencies": {},
+  "devDependencies": {
+    "babel-eslint": "^7.1.1",
+    "eslint": "^3.13.1",
     "grunt": "^1.0.1",
     "grunt-karma": "^2.0.0",
     "jasmine-core": "^2.5.2",
-    "jspm": "0.17.0-beta.32",
+    "jspm": "^0.17.0-beta.45",
     "karma": "^1.1.1",
     "karma-coverage": "^1.0.0",
     "karma-jasmine": "^1.1.0",
@@ -45,10 +49,6 @@
     "karma-qunit": "^1.1.0",
     "phantomjs-prebuilt": "^2.1.7",
     "qunitjs": "^1.23.1"
-  },
-  "devDependencies": {
-    "babel-eslint": "^7.1.1",
-    "eslint": "^3.13.1"
   },
   "jspm": {
     "registry": "jspm",
@@ -66,7 +66,6 @@
       "path": "npm:jspm-nodelibs-path@^0.2.0",
       "process": "npm:jspm-nodelibs-process@^0.2.0"
     },
-
     "peerDependencies": {
       "css": "github:systemjs/plugin-css@^0.1",
       "less": "npm:systemjs-less-plugin@^2",

@@ -13,7 +13,7 @@ version:
 
 install: 
 	npm install
-	jspm install
+	$$(npm bin)/jspm install
 
 
 test:
@@ -24,18 +24,18 @@ backbone: 	ig_backbone 	ig_backbone_bundle
 backgrid: 	ig_backgrid 	ig_backgrid_bundle
 
 ig_backbone:
-	jspm build src/ig_backbone dist/ig_backbone.js --format esm --skip-source-maps --skip-encode-names
+	$$(npm bin)/jspm build src/ig_backbone dist/ig_backbone.js --format esm --skip-source-maps --skip-encode-names
 
 ig_backbone_bundle:	
-	jspm build src/ig_backbone dist/ig_backbone.bundle.js --format umd --skip-encode-names --global-name window 
+	$$(npm bin)/jspm build src/ig_backbone dist/ig_backbone.bundle.js --format umd --skip-encode-names --global-name window 
 
 	
 	
 ig_backgrid:
-	jspm build src/ig_backgrid dist/ig_backgrid.js --format esm --skip-source-maps --skip-encode-names  --config jspm.backgrid.amd.json  --global-deps '{"backbone":"Backbone"}' 
+	$$(npm bin)/jspm build src/ig_backgrid dist/ig_backgrid.js --format esm --skip-source-maps --skip-encode-names  --config jspm.backgrid.amd.json  --global-deps '{"backbone":"Backbone"}' 
 
 ig_backgrid_bundle:	
-	jspm build src/ig_backgrid dist/ig_backgrid.bundle.js  --format umd --skip-encode-names --global-name window --config jspm.backgrid.amd.json  --global-deps '{"backbone":"Backbone"}' 
+	$$(npm bin)/jspm build src/ig_backgrid dist/ig_backgrid.bundle.js  --format umd --skip-encode-names --global-name window --config jspm.backgrid.amd.json  --global-deps '{"backbone":"Backbone"}' 
 
 
 update_version:
