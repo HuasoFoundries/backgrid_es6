@@ -13,9 +13,10 @@ SystemJS.config({
   },
   devConfig: {
     "map": {
-      "fs": "npm:jspm-nodelibs-fs@0.2.0",
-      "path": "npm:jspm-nodelibs-path@0.2.1",
-      "process": "npm:jspm-nodelibs-process@0.2.0"
+      "fs": "npm:jspm-nodelibs-fs@0.2.1",
+      "path": "npm:jspm-nodelibs-path@0.2.3",
+      "process": "npm:jspm-nodelibs-process@0.2.1",
+      "backbone": "github:huasofoundries/backbone_es6@17.0.11"
     }
   },
   transpiler: "plugin-babel",
@@ -326,18 +327,11 @@ SystemJS.config({
     "github:*/*.json"
   ],
   map: {
-    "backbone": "github:huasofoundries/backbone_es6@17.0.11",
+    "css": "github:systemjs/plugin-css@0.1.36",
     "plugin-babel": "npm:systemjs-plugin-babel@0.0.25",
     "json": "github:systemjs/plugin-json@0.3.0",
-    "css": "github:systemjs/plugin-css@0.1.32",
-    "less": "npm:systemjs-less-plugin@2.0.0",
+    "less": "npm:systemjs-less-plugin@2.2.1",
     "text": "github:systemjs/plugin-text@0.0.7"
   },
-  packages: {
-    "npm:systemjs-less-plugin@2.0.0": {
-      "map": {
-        "css": "github:systemjs/plugin-css@0.1.32"
-      }
-    }
-  }
+  packages: {}
 });
