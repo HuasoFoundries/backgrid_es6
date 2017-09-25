@@ -2479,7 +2479,7 @@ var Modal = function (_super) {
   };
 
   Modal.prototype.delegateModalEvents = function () {
-    var cancelEl, key, match, selector, submitEl, trigger, _results;
+    var cancelEl, key, match, selector, submitEl, trigger$$1, _results;
     this.active = true;
     cancelEl = this.getOption('cancelEl');
     submitEl = this.getOption('submitEl');
@@ -2493,9 +2493,9 @@ var Modal = function (_super) {
     for (key in this.views) {
       if (_.isString(key) && key !== 'length') {
         match = key.match(/^(\S+)\s*(.*)$/);
-        trigger = match[1];
+        trigger$$1 = match[1];
         selector = match[2];
-        _results.push(this.$el.on(trigger, selector, this.views[key], this.triggerView));
+        _results.push(this.$el.on(trigger$$1, selector, this.views[key], this.triggerView));
       } else {
         _results.push(void 0);
       }
@@ -2504,7 +2504,7 @@ var Modal = function (_super) {
   };
 
   Modal.prototype.undelegateModalEvents = function () {
-    var cancelEl, key, match, selector, submitEl, trigger, _results;
+    var cancelEl, key, match, selector, submitEl, trigger$$1, _results;
     this.active = false;
     cancelEl = this.getOption('cancelEl');
     submitEl = this.getOption('submitEl');
@@ -2518,9 +2518,9 @@ var Modal = function (_super) {
     for (key in this.views) {
       if (_.isString(key) && key !== 'length') {
         match = key.match(/^(\S+)\s*(.*)$/);
-        trigger = match[1];
+        trigger$$1 = match[1];
         selector = match[2];
-        _results.push(this.$el.off(trigger, selector, this.views[key], this.triggerView));
+        _results.push(this.$el.off(trigger$$1, selector, this.views[key], this.triggerView));
       } else {
         _results.push(void 0);
       }
