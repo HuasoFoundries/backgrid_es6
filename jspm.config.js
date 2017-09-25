@@ -326,9 +326,9 @@ SystemJS.config({
     "github:*/*.json"
   ],
   map: {
+    "backbone": "github:huasofoundries/backbone_es6@17.0.11",
     "plugin-babel": "npm:systemjs-plugin-babel@0.0.25",
     "json": "github:systemjs/plugin-json@0.3.0",
-    "backbone": "github:huasofoundries/backbone_es6@17.0.11",
     "css": "github:systemjs/plugin-css@0.1.32",
     "less": "npm:systemjs-less-plugin@2.0.0",
     "text": "github:systemjs/plugin-text@0.0.7"
