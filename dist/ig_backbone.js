@@ -2324,15 +2324,14 @@ Backbone$1.sync = function (method, model, options) {
 
 Backbone$1.LocalStorage = LocalStorage;
 
-var __bind = function __bind(fn, me) {
+var bind$1 = function bind$1(fn, me) {
   return function () {
     return fn.apply(me, arguments);
   };
 };
-var __hasProp = {}.hasOwnProperty;
-var __extends = function __extends(child, parent) {
+var extend$2 = function extend$2(child, parent) {
   for (var key in parent) {
-    if (__hasProp.call(parent, key)) child[key] = parent[key];
+    if (hasProp.call(parent, key)) child[key] = parent[key];
   }
 
   function ctor() {
@@ -2343,15 +2342,17 @@ var __extends = function __extends(child, parent) {
   child.__super__ = parent.prototype;
   return child;
 };
-var __indexOf = [].indexOf || function (item) {
+var hasProp = {}.hasOwnProperty;
+var indexOf = [].indexOf || function (item) {
   for (var i = 0, l = this.length; i < l; i++) {
     if (i in this && this[i] === item) return i;
   }
   return -1;
 };
 
-var Modal = function (_super) {
-  __extends(Modal, _super);
+var focusableElements = ['a[href]', 'area[href]', 'input:not([disabled])', 'select:not([disabled])', 'textarea:not([disabled])', 'button:not([disabled])', 'iframe', 'object', 'embed', '*[tabindex]', '*[contenteditable]'].join(', ');
+var Modal = function (superClass) {
+  extend$2(Modal, superClass);
 
   Modal.prototype.prefix = 'bbm';
 
@@ -2362,42 +2363,49 @@ var Modal = function (_super) {
   Modal.prototype.showViewOnRender = true;
 
   function Modal() {
-    this.triggerCancel = __bind(this.triggerCancel, this);
-    this.triggerSubmit = __bind(this.triggerSubmit, this);
-    this.triggerView = __bind(this.triggerView, this);
-    this.clickOutsideElement = __bind(this.clickOutsideElement, this);
-    this.clickOutside = __bind(this.clickOutside, this);
-    this.checkKey = __bind(this.checkKey, this);
-    this.rendererCompleted = __bind(this.rendererCompleted, this);
+    this.triggerCancel = bind$1(this.triggerCancel, this);
+    this.triggerSubmit = bind$1(this.triggerSubmit, this);
+    this.triggerView = bind$1(this.triggerView, this);
+    this.clickOutsideElement = bind$1(this.clickOutsideElement, this);
+    this.clickOutside = bind$1(this.clickOutside, this);
+    this.checkKey = bind$1(this.checkKey, this);
+    this.rendererCompleted = bind$1(this.rendererCompleted, this);
     this.args = Array.prototype.slice.apply(arguments);
     Backbone$1.View.prototype.constructor.apply(this, this.args);
     this.setUIElements();
   }
 
   Modal.prototype.render = function (options) {
-    var data, _ref;
+    var $focusEl, data, ref;
     data = this.serializeData();
     if (!options || _.isEmpty(options)) {
       options = 0;
     }
-    this.$el.addClass("" + this.prefix + "-wrapper");
-    this.modalEl = Backbone$1.$('<div />').addClass("" + this.prefix + "-modal");
+    this.$el.addClass(this.prefix + "-wrapper");
+    this.modalEl = Backbone$1.$('<div />').addClass(this.prefix + "-modal");
     if (this.template) {
       this.modalEl.html(this.buildTemplate(this.template, data));
     }
     this.$el.html(this.modalEl);
     if (this.viewContainer) {
       this.viewContainerEl = this.modalEl.find(this.viewContainer);
-      this.viewContainerEl.addClass("" + this.prefix + "-modal__views");
+      this.viewContainerEl.addClass(this.prefix + "-modal__views");
     } else {
       this.viewContainerEl = this.modalEl;
     }
-    Backbone$1.$(':focus').blur();
-    if (((_ref = this.views) != null ? _ref.length : void 0) > 0 && this.showViewOnRender) {
+    $focusEl = Backbone$1.$(document.activeElement);
+    if (!this.previousFocus) {
+      this.previousFocus = $focusEl;
+    }
+    $focusEl.blur();
+    if (((ref = this.views) != null ? ref.length : void 0) > 0 && this.showViewOnRender) {
       this.openAt(options);
     }
     if (typeof this.onRender === "function") {
       this.onRender();
+    }
+    if (this.active) {
+      return true;
     }
     this.delegateModalEvents();
     if (this.$el.fadeIn && this.animate) {
@@ -2415,7 +2423,7 @@ var Modal = function (_super) {
   };
 
   Modal.prototype.rendererCompleted = function () {
-    var _ref;
+    var ref;
     if (this.keyControl) {
       Backbone$1.$('body').on('keyup.bbm', this.checkKey);
       this.$el.on('mouseup.bbm', this.clickOutsideElement);
@@ -2423,19 +2431,28 @@ var Modal = function (_super) {
     }
     this.modalEl.css({
       opacity: 1
-    }).addClass("" + this.prefix + "-modal--open");
+    }).addClass(this.prefix + "-modal--open");
+    this.setInitialFocus();
     if (typeof this.onShow === "function") {
       this.onShow();
     }
-    return (_ref = this.currentView) != null ? typeof _ref.onShow === "function" ? _ref.onShow() : void 0 : void 0;
+    return (ref = this.currentView) != null ? typeof ref.onShow === "function" ? ref.onShow() : void 0 : void 0;
+  };
+
+  Modal.prototype.setInitialFocus = function () {
+    if (this.autofocus) {
+      return this.$(this.autofocus).focus();
+    } else {
+      return this.$('*').filter(focusableElements).filter(':visible').first().focus();
+    }
   };
 
   Modal.prototype.setUIElements = function () {
-    var _ref;
+    var ref;
     this.template = this.getOption('template');
     this.views = this.getOption('views');
-    if ((_ref = this.views) != null) {
-      _ref.length = _.size(this.views);
+    if ((ref = this.views) != null) {
+      ref.length = _.size(this.views);
     }
     this.viewContainer = this.getOption('viewContainer');
     this.animate = this.getOption('animate');
@@ -2451,7 +2468,7 @@ var Modal = function (_super) {
     if (!option) {
       return;
     }
-    if (this.options && __indexOf.call(this.options, option) >= 0 && this.options[option] != null) {
+    if (this.options && indexOf.call(this.options, option) >= 0 && this.options[option] != null) {
       return this.options[option];
     } else {
       return this[option];
@@ -2473,7 +2490,7 @@ var Modal = function (_super) {
   };
 
   Modal.prototype.delegateModalEvents = function () {
-    var cancelEl, key, match, selector, submitEl, trigger$$1, _results;
+    var cancelEl, key, match, results, selector, submitEl, trigger$$1;
     this.active = true;
     cancelEl = this.getOption('cancelEl');
     submitEl = this.getOption('submitEl');
@@ -2483,22 +2500,22 @@ var Modal = function (_super) {
     if (cancelEl) {
       this.$el.on('click', cancelEl, this.triggerCancel);
     }
-    _results = [];
+    results = [];
     for (key in this.views) {
       if (_.isString(key) && key !== 'length') {
         match = key.match(/^(\S+)\s*(.*)$/);
         trigger$$1 = match[1];
         selector = match[2];
-        _results.push(this.$el.on(trigger$$1, selector, this.views[key], this.triggerView));
+        results.push(this.$el.on(trigger$$1, selector, this.views[key], this.triggerView));
       } else {
-        _results.push(void 0);
+        results.push(void 0);
       }
     }
-    return _results;
+    return results;
   };
 
   Modal.prototype.undelegateModalEvents = function () {
-    var cancelEl, key, match, selector, submitEl, trigger$$1, _results;
+    var cancelEl, key, match, results, selector, submitEl, trigger$$1;
     this.active = false;
     cancelEl = this.getOption('cancelEl');
     submitEl = this.getOption('submitEl');
@@ -2508,18 +2525,18 @@ var Modal = function (_super) {
     if (cancelEl) {
       this.$el.off('click', cancelEl, this.triggerCancel);
     }
-    _results = [];
+    results = [];
     for (key in this.views) {
       if (_.isString(key) && key !== 'length') {
         match = key.match(/^(\S+)\s*(.*)$/);
         trigger$$1 = match[1];
         selector = match[2];
-        _results.push(this.$el.off(trigger$$1, selector, this.views[key], this.triggerView));
+        results.push(this.$el.off(trigger$$1, selector, this.views[key], this.triggerView));
       } else {
-        _results.push(void 0);
+        results.push(void 0);
       }
     }
-    return _results;
+    return results;
   };
 
   Modal.prototype.checkKey = function (e) {
@@ -2534,8 +2551,8 @@ var Modal = function (_super) {
   };
 
   Modal.prototype.clickOutside = function (e) {
-    var _ref;
-    if (((_ref = this.outsideElement) != null ? _ref.hasClass("" + this.prefix + "-wrapper") : void 0) && this.active) {
+    var ref;
+    if (((ref = this.outsideElement) != null ? ref.hasClass(this.prefix + "-wrapper") : void 0) && this.active) {
       return this.triggerCancel();
     }
   };
@@ -2582,7 +2599,7 @@ var Modal = function (_super) {
   };
 
   Modal.prototype.triggerView = function (e) {
-    var index, instance, key, options, _base, _base1, _ref;
+    var base, base1, index, instance, key, options, ref;
     if (e != null) {
       if (typeof e.preventDefault === "function") {
         e.preventDefault();
@@ -2592,12 +2609,12 @@ var Modal = function (_super) {
     instance = this.buildView(options.view, options.viewOptions);
     if (this.currentView) {
       this.previousView = this.currentView;
-      if (!((_ref = options.openOptions) != null ? _ref.skipSubmit : void 0)) {
-        if ((typeof (_base = this.previousView).beforeSubmit === "function" ? _base.beforeSubmit(e) : void 0) === false) {
+      if (!((ref = options.openOptions) != null ? ref.skipSubmit : void 0)) {
+        if ((typeof (base = this.previousView).beforeSubmit === "function" ? base.beforeSubmit(e) : void 0) === false) {
           return;
         }
-        if (typeof (_base1 = this.previousView).submit === "function") {
-          _base1.submit();
+        if (typeof (base1 = this.previousView).submit === "function") {
+          base1.submit();
         }
       }
     }
@@ -2625,7 +2642,7 @@ var Modal = function (_super) {
   };
 
   Modal.prototype.animateToView = function (view) {
-    var container, newHeight, previousHeight, style, tester, _base, _ref;
+    var base, container, newHeight, previousHeight, ref, style, tester;
     style = {
       position: 'relative',
       top: -9999,
@@ -2649,10 +2666,10 @@ var Modal = function (_super) {
     newHeight = container.outerHeight();
     if (previousHeight === newHeight) {
       this.$(this.viewContainerEl).html(view);
-      if (typeof (_base = this.currentView).onShow === "function") {
-        _base.onShow();
+      if (typeof (base = this.currentView).onShow === "function") {
+        base.onShow();
       }
-      return (_ref = this.previousView) != null ? typeof _ref.destroy === "function" ? _ref.destroy() : void 0 : void 0;
+      return (ref = this.previousView) != null ? typeof ref.destroy === "function" ? ref.destroy() : void 0 : void 0;
     } else {
       if (this.animate) {
         this.$(this.viewContainerEl).css({
@@ -2662,15 +2679,15 @@ var Modal = function (_super) {
           height: newHeight
         }, 100, function (_this) {
           return function () {
-            var _base1, _ref1;
+            var base1, ref1;
             _this.$(_this.viewContainerEl).css({
               opacity: 1
             }).removeAttr('style');
             _this.$(_this.viewContainerEl).html(view);
-            if (typeof (_base1 = _this.currentView).onShow === "function") {
-              _base1.onShow();
+            if (typeof (base1 = _this.currentView).onShow === "function") {
+              base1.onShow();
             }
-            return (_ref1 = _this.previousView) != null ? typeof _ref1.destroy === "function" ? _ref1.destroy() : void 0 : void 0;
+            return (ref1 = _this.previousView) != null ? typeof ref1.destroy === "function" ? ref1.destroy() : void 0 : void 0;
           };
         }(this));
       } else {
@@ -2682,11 +2699,11 @@ var Modal = function (_super) {
   };
 
   Modal.prototype.triggerSubmit = function (e) {
-    var _ref, _ref1;
+    var ref, ref1;
     if (e != null) {
       e.preventDefault();
     }
-    if (Backbone$1.$(e.target).is('textarea')) {
+    if (Backbone$1.$(e != null ? e.target : void 0).is('textarea')) {
       return;
     }
     if (this.beforeSubmit) {
@@ -2699,12 +2716,12 @@ var Modal = function (_super) {
         return;
       }
     }
-    if (!this.submit && !((_ref = this.currentView) != null ? _ref.submit : void 0) && !this.getOption('submitEl')) {
+    if (!this.submit && !((ref = this.currentView) != null ? ref.submit : void 0) && !this.getOption('submitEl')) {
       return this.triggerCancel();
     }
-    if ((_ref1 = this.currentView) != null) {
-      if (typeof _ref1.submit === "function") {
-        _ref1.submit();
+    if ((ref1 = this.currentView) != null) {
+      if (typeof ref1.submit === "function") {
+        ref1.submit();
       }
     }
     if (typeof this.submit === "function") {
@@ -2746,16 +2763,17 @@ var Modal = function (_super) {
       this.onDestroy();
     }
     this.shouldAnimate = false;
-    this.modalEl.addClass("" + this.prefix + "-modal--destroy");
+    this.modalEl.addClass(this.prefix + "-modal--destroy");
     removeViews = function (_this) {
       return function () {
-        var _ref;
-        if ((_ref = _this.currentView) != null) {
-          if (typeof _ref.remove === "function") {
-            _ref.remove();
+        var ref, ref1;
+        if ((ref = _this.currentView) != null) {
+          if (typeof ref.remove === "function") {
+            ref.remove();
           }
         }
-        return _this.remove();
+        _this.remove();
+        return (ref1 = _this.previousFocus) != null ? typeof ref1.focus === "function" ? ref1.focus() : void 0 : void 0;
       };
     }(this);
     if (this.$el.fadeOut && this.animate) {
