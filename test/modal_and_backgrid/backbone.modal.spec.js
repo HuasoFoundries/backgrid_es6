@@ -198,6 +198,7 @@ describe('Backbone.Modal', function () {
       expect(document.activeElement).toBe(document.querySelector('#id'));
       return view.destroy();
     });
+
     it('should save a reference to the previously focused element', function () {
       var expected, view;
       expected = Backbone.$(document.activeElement);
@@ -207,6 +208,8 @@ describe('Backbone.Modal', function () {
     });
     return describe('when called again', function () {
       return it('re-renders without animation or event delegation', function () {
+        view = new modal();
+        view.render();
         spyOn(view, 'delegateModalEvents');
         spyOn(view, 'rendererCompleted');
         view.render();

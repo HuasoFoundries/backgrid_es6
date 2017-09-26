@@ -1,8 +1,5 @@
-(function (window, QUnit, undefined) {
+(function (QUnit) {
 
-  console.log('Backbone is', Backbone.VERSION);
-  console.log('$ is', $.fn.jquery);
-  console.log('_ is', _.VERSION);
   var sync = Backbone.sync;
   var ajax = Backbone.ajax;
   var emulateHTTP = Backbone.emulateHTTP;
@@ -45,4 +42,4 @@
     history.replaceState = replaceState;
   });
 
-})(window, QUnit);
+})(QUnit);
