@@ -1,6 +1,6 @@
 {
   "name": "backgrid_es6",
-  "version": "1.0.0",
+  "version": "0.9.0",
   "description": "Backgrid as an ES6, with bundled plugins and extensions",
   "author": "Felipe Figueroa  <amenadiel@gmail.com>",
   "license": "MIT",
