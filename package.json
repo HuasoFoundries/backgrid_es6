@@ -1,91 +1,63 @@
 {
-  "name": "ig_backbone",
-  "version": "17.2.0",
-  "description": "Backbone and Backgrid as ES6 modules, with bundled plugins and extensions",
+  "name": "backgrid_es6",
+  "version": "1.0.0",
+  "description": "Backgrid as an ES6, with bundled plugins and extensions",
   "author": "Felipe Figueroa  <amenadiel@gmail.com>",
-  "contributors": [
-    {
-      "name": "José Salazar",
-      "email": "jolsalazar@gmail.com",
-      "role": "Senior Developer"
-    },
-    {
-      "name": "Gabriel Tamayo",
-      "email": "gabriel.tamayo@gmail.com",
-      "role": "Junion Developer"
-    }
-  ],
-  "license": "propietary",
+  "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/InstaGIS/backbone-backgrid-js"
+    "url": "https://github.com/InstaGIS/ig_backgrid"
   },
   "bugs": {
-    "url": "https://github.com/InstaGIS/backbone-backgrid-js/issues"
+    "url": "https://github.com/InstaGIS/ig_backgrid/issues"
   },
-  "homepage": "https://www.instagis.com",
+  "homepage": "https://github.com/InstaGIS/ig_backgrid",
   "engines": {
     "node": "6.0.x"
   },
-  "files": [
-    "src",
-    "dist"
+  "keywords": [
+    "backgrid",
+    "es6",
+    "es2015"
   ],
-  "main": "dist/ig_backbone.bundle.js",
-  "jsnext:main": "dist/ig_backbone.js",
-  "private": true,
+  "files": [
+    "dist",
+    "package.json",
+    "README.md",
+    "LICENCE"
+  ],
+  "main": "dist/ig_backgrid.bundle.js",
+  "jsnext:main": "dist/ig_backgrid.js",
   "dependencies": {},
   "devDependencies": {
     "babel-eslint": "^7.1.1",
     "eslint": "^3.13.1",
-    "grunt": "^1.0.1",
-    "grunt-karma": "^2.0.0",
     "jasmine-core": "^2.5.2",
     "jspm": "^0.17.0-beta.45",
     "karma": "^1.1.1",
     "karma-coverage": "^1.0.0",
     "karma-jasmine": "^1.1.0",
+    "karma-mocha-reporter": "^2.2.4",
     "karma-phantomjs-launcher": "^1.0.1",
-    "karma-qunit": "^1.2.1",
-    "phantomjs-prebuilt": "^2.1.7",
-    "qunitjs": "^2.4.0"
+    "phantomjs-prebuilt": "^2.1.7"
   },
   "jspm": {
     "registry": "jspm",
-    "main": "ig_backbone.bundle.js",
-    "format": "amd",
+    "main": "ig_backgrid.js",
+    "format": "esm",
     "directories": {
       "lib": "dist"
     },
     "dependencies": {},
     "devDependencies": {
-      "backbone": "github:huasofoundries/backbone_es6@^17",
       "fs": "npm:jspm-nodelibs-fs@^0.2.0",
       "path": "npm:jspm-nodelibs-path@^0.2.0",
       "process": "npm:jspm-nodelibs-process@^0.2.0"
     },
     "peerDependencies": {
       "css": "github:systemjs/plugin-css@^0.1.36",
-      "json": "github:systemjs/plugin-json@^0.3.0",
       "less": "npm:systemjs-less-plugin@^2",
-      "plugin-babel": "npm:systemjs-plugin-babel@^0.0.25",
-      "text": "github:systemjs/plugin-text@^0.0.7"
-    },
-    "overrides": {
-      "npm:browserify-zlib@0.1.4": {
-        "dependencies": {
-          "readable-stream": "^2.0.2",
-          "pako": "~0.2.0"
-        },
-        "map": {
-          "_stream_transform": "readable-stream/transform"
-        }
-      },
-      "npm:inherits@2.0.3": {
-        "ignore": [
-          "test.js"
-        ]
-      }
+      "plugin-babel": "npm:systemjs-plugin-babel@^0.0.25"
     }
   }
 }
