@@ -16,8 +16,8 @@ module.exports = function (config) {
       'test/vendor/jquery.min.js',
       'test/vendor/underscore.js',
       'test/vendor/backbone.js',
-      'dist/ig_backgrid.bundle.js',
-      'test/backgrid/*.js'
+      'dist/backgrid.js',
+      'test/*.js'
     ]
 
   });

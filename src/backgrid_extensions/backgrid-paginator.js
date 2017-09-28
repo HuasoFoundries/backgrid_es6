@@ -11,7 +11,7 @@ import Backbone from 'backbone';
 
 import {
   Backgrid
-} from 'backgrid';
+} from '../backgrid.es6.js';
 
 "use strict";
 

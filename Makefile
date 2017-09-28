@@ -6,28 +6,20 @@ default: build
 .PHONY: ig_backgrid test build ig_backgrid_bundle  backgrid 
 
  
-build: backgrid
+build: 
+	$$(npm bin)/rollup -c
+	sed -i s/".BackgridES6"/""/g dist/backgrid.js
 
 version:
 	@echo $(VERSION)
 
 install: 
 	npm install
-	$$(npm bin)/jspm install
 
 
 test:
 	$$(npm bin)/karma start
 
-
-backgrid: 	ig_backgrid 	ig_backgrid_bundle
-
-
-ig_backgrid:
-	$$(npm bin)/jspm build src dist/ig_backgrid.js --format esm --skip-source-maps --skip-encode-names 
-
-ig_backgrid_bundle:	
-	$$(npm bin)/jspm build src dist/ig_backgrid.bundle.js  --format umd --skip-encode-names --global-name window --skip-source-maps
 
 
 update_version:

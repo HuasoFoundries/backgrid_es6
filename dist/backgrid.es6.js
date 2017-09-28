@@ -1,12 +1,6 @@
-(function (global, factory) {
-   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('underscore'), require('backbone'), require('jquery')) :
-   typeof define === 'function' && define.amd ? define(['exports', 'underscore', 'backbone', 'jquery'], factory) :
-   (factory((global.window = global.window || {}),global._,global.Backbone,global.$));
-}(this, (function (exports,_,Backbone,$) { 'use strict';
-
-_ = 'default' in _ ? _['default'] : _;
-Backbone = 'default' in Backbone ? Backbone['default'] : Backbone;
-$ = 'default' in $ ? $['default'] : $;
+import _ from 'underscore';
+import Backbone from 'backbone';
+import $ from 'jquery';
 
 /*
   backbone.paginator
@@ -17,6 +11,25 @@ $ = 'default' in $ ? $['default'] : $;
   @module
   @license MIT
 */
+
+/**
+   __BROWSER ONLY__
+
+   If you already have an object named `PageableCollection` attached to the
+   `Backbone` module, you can use this to return a local reference to this
+   PageableCollection class and reset the name PageableCollection to its
+   previous definition.
+
+       // The left hand side gives you a reference to this
+       // PageableCollection implementation, the right hand side
+       // resets PageableCollection to your other PageableCollection.
+       var PageableCollection = PageableCollection.noConflict();
+
+   @static
+   @return {PageableCollection}
+*/
+
+"use strict";
 
 var _extend = _.extend;
 var _omit = _.omit;
@@ -46,19 +59,17 @@ function finiteInt(val, name) {
 }
 
 function queryStringToParams(qs) {
-  var kvp,
-      k,
-      v,
-      ls,
-      params = {},
-      decode = decodeURIComponent;
+  var kvp, k, v, ls, params = {},
+    decode = decodeURIComponent;
   var kvps = qs.split('&');
   for (var i = 0, l = kvps.length; i < l; i++) {
     var param = kvps[i];
     kvp = param.split('='), k = kvp[0], v = kvp[1];
     if (v == null) v = true;
     k = decode(k), v = decode(v), ls = params[k];
-    if (_isArray(ls)) ls.push(v);else if (ls) params[k] = [ls, v];else params[k] = v;
+    if (_isArray(ls)) ls.push(v);
+    else if (ls) params[k] = [ls, v];
+    else params[k] = v;
   }
   return params;
 }
@@ -106,36 +117,45 @@ var PageableCollection = Backbone.Collection.extend({
 
   /**
      The container object to store all pagination states.
-      You can override the default state by extending this class or specifying
+
+     You can override the default state by extending this class or specifying
      them in an `options` hash to the constructor.
-      @property {number} firstPage = 1 - The first page index. Set to 0 if
+
+     @property {number} firstPage = 1 - The first page index. Set to 0 if
      your server API uses 0-based indices. You should only override this value
      during extension, initialization or reset by the server after
      fetching. This value should be read only at other times.
-      @property {number} lastPage = null - The last page index. This value
+
+     @property {number} lastPage = null - The last page index. This value
      is __read only__ and it's calculated based on whether `firstPage` is 0 or
      1, during bootstrapping, fetching and resetting. Please don't change this
      value under any circumstances.
-      @property {number} currentPage = null - The current page index. You
+
+     @property {number} currentPage = null - The current page index. You
      should only override this value during extension, initialization or reset
      by the server after fetching. This value should be read only at other
      times. Can be a 0-based or 1-based index, depending on whether
      `firstPage` is 0 or 1. If left as default, it will be set to `firstPage`
      on initialization.
-      @property {number} pageSize = 25 - How many records to show per
+
+     @property {number} pageSize = 25 - How many records to show per
      page. This value is __read only__ after initialization, if you want to
      change the page size after initialization, you must call
      PageableCollection#setPageSize.
-      @property {number} totalPages = null - How many pages there are. This
+
+     @property {number} totalPages = null - How many pages there are. This
      value is __read only__ and it is calculated from `totalRecords`.
-      @property {number} totalRecords = null - How many records there
+
+     @property {number} totalRecords = null - How many records there
      are. This value is __required__ under server mode. This value is optional
      for client mode as the number will be the same as the number of models
      during bootstrapping and during fetching, either supplied by the server
      in the metadata, or calculated from the size of the response.
-      @property {string} sortKey = null - The model attribute to use for
+
+     @property {string} sortKey = null - The model attribute to use for
      sorting.
-      @property {number} order = -1 - The order to use for sorting. Specify
+
+     @property {number} order = -1 - The order to use for sorting. Specify
      -1 for ascending order or 1 for descending order. If 0, no client side
      sorting will be done and the order query parameter will not be sent to
      the server during a fetch.
@@ -162,9 +182,11 @@ var PageableCollection = Backbone.Collection.extend({
   /**
      A translation map to convert PageableCollection state attributes
      to the query parameters accepted by your server API.
-      You can override the default state by extending this class or specifying
+
+     You can override the default state by extending this class or specifying
      them in `options.queryParams` object hash to the constructor.
-      @property {string} currentPage = "page"
+
+     @property {string} currentPage = "page"
      @property {string} pageSize = "per_page"
      @property {string} totalPages = "total_pages"
      @property {string} totalRecords = "total_entries"
@@ -191,7 +213,8 @@ var PageableCollection = Backbone.Collection.extend({
      Given a list of models or model attributues, bootstraps the full
      collection in client mode or infinite mode, or just the page you want in
      server mode.
-      If you want to initialize a collection to a different state than the
+
+     If you want to initialize a collection to a different state than the
      default, you can specify them in `options.state`. Any state parameters
      supplied will be merged with the default. If you want to change the
      default mapping from PageableCollection#state keys to your server API's
@@ -199,34 +222,46 @@ var PageableCollection = Backbone.Collection.extend({
      `option.queryParams`. Likewise, any mapping provided will be merged with
      the default. Lastly, all Backbone.Collection constructor options are also
      accepted.
-      See:
-      - PageableCollection#state
+
+     See:
+
+     - PageableCollection#state
      - PageableCollection#queryParams
      - [Backbone.Collection#initialize](http://backbonejs.org/#Collection-constructor)
-      @constructor
-      @property {Backbone.Collection} fullCollection - __CLIENT MODE ONLY__
+
+     @constructor
+
+     @property {Backbone.Collection} fullCollection - __CLIENT MODE ONLY__
      This collection is the internal storage for the bootstrapped or fetched
      models. You can use this if you want to operate on all the pages.
-      @param {Array.<Object>} models
-      @param {Object} options
-      @param {function(*, *): number} options.comparator - If specified, this
+
+     @param {Array.<Object>} models
+
+     @param {Object} options
+
+     @param {function(*, *): number} options.comparator - If specified, this
      comparator is set to the current page under server mode, or the
      PageableCollection#fullCollection otherwise.
-      @param {boolean} options.full 0 If `false` and either a
+
+     @param {boolean} options.full 0 If `false` and either a
      `options.comparator` or `sortKey` is defined, the comparator is attached
      to the current page. Default is `true` under client or infinite mode and
      the comparator will be attached to the PageableCollection#fullCollection.
-      @param {Object} options.state - The state attributes overriding the defaults.
-      @param {string} options.state.sortKey - The model attribute to use for
+
+     @param {Object} options.state - The state attributes overriding the defaults.
+
+     @param {string} options.state.sortKey - The model attribute to use for
      sorting. If specified instead of `options.comparator`, a comparator will
      be automatically created using this value, and optionally a sorting order
      specified in `options.state.order`. The comparator is then attached to
      the new collection instance.
-      @param {number} options.state.order - The order to use for sorting. Specify
+
+     @param {number} options.state.order - The order to use for sorting. Specify
      -1 for ascending order and 1 for descending order.
-      @param {Object} options.queryParam
+
+     @param {Object} options.queryParam
   */
-  constructor: function constructor(models, options) {
+  constructor: function (models, options) {
 
     BBColProto.constructor.apply(this, arguments);
 
@@ -234,15 +269,22 @@ var PageableCollection = Backbone.Collection.extend({
 
     var mode = this.mode = options.mode || this.mode || PageableProto.mode;
 
-    var queryParams = _extend({}, PageableProto.queryParams, this.queryParams, options.queryParams || {});
+    var queryParams = _extend({}, PageableProto.queryParams, this.queryParams,
+      options.queryParams || {});
 
-    queryParams.directions = _extend({}, PageableProto.queryParams.directions, this.queryParams.directions, queryParams.directions);
+    queryParams.directions = _extend({},
+      PageableProto.queryParams.directions,
+      this.queryParams.directions,
+      queryParams.directions);
 
     this.queryParams = queryParams;
 
-    var state = this.state = _extend({}, PageableProto.state, this.state, options.state);
+    var state = this.state = _extend({}, PageableProto.state, this.state,
+      options.state);
 
-    state.currentPage = state.currentPage == null ? state.firstPage : state.currentPage;
+    state.currentPage = state.currentPage == null ?
+      state.firstPage :
+      state.currentPage;
 
     if (!_isArray(models)) models = models ? [models] : [];
     models = models.slice();
@@ -289,12 +331,13 @@ var PageableCollection = Backbone.Collection.extend({
 
   /**
      Makes a Backbone.Collection that contains all the pages.
-      @private
+
+     @private
      @param {Array.<Object|Backbone.Model>} models
      @param {Object} options Options for Backbone.Collection constructor.
      @return {Backbone.Collection}
   */
-  _makeFullCollection: function _makeFullCollection(models, options) {
+  _makeFullCollection: function (models, options) {
 
     var properties = ["url", "model", "sync", "comparator"];
     var thisProto = this.constructor.prototype;
@@ -308,7 +351,7 @@ var PageableCollection = Backbone.Collection.extend({
       }
     }
 
-    var fullCollection = new (Backbone.Collection.extend(proto))(models, options);
+    var fullCollection = new(Backbone.Collection.extend(proto))(models, options);
 
     for (i = 0, length = properties.length; i < length; i++) {
       prop = properties[i];
@@ -325,15 +368,19 @@ var PageableCollection = Backbone.Collection.extend({
      the `add`, `remove`, `reset`, and the `sort` events. The returned event
      handler will synchronize the current page collection and the full
      collection's models.
-      @private
-      @fires PageableCollection#pageable:state:change when handling an
+
+     @private
+
+     @fires PageableCollection#pageable:state:change when handling an
      `add`, `remove`, or `reset` event
-      @param {PageableCollection} pageCol
+
+     @param {PageableCollection} pageCol
      @param {Backbone.Collection} fullCol
-      @return {function(string, Backbone.Model, Backbone.Collection, Object)}
+
+     @return {function(string, Backbone.Model, Backbone.Collection, Object)}
      Collection event handler
   */
-  _makeCollectionEventHandler: function _makeCollectionEventHandler(pageCol, fullCol) {
+  _makeCollectionEventHandler: function (pageCol, fullCol) {
 
     return function collectionEventHandler(event, model, collection, options) {
 
@@ -346,17 +393,15 @@ var PageableCollection = Backbone.Collection.extend({
 
       var state = _clone(pageCol.state);
       var firstPage = state.firstPage;
-      var currentPage = firstPage === 0 ? state.currentPage : state.currentPage - 1;
+      var currentPage = firstPage === 0 ?
+        state.currentPage :
+        state.currentPage - 1;
       var pageSize = state.pageSize;
       var pageStart = currentPage * pageSize,
-          pageEnd = pageStart + pageSize;
+        pageEnd = pageStart + pageSize;
 
       if (event == "add") {
-        var pageIndex,
-            fullIndex,
-            addAt,
-            colToAdd,
-            options = options || {};
+        var pageIndex, fullIndex, addAt, colToAdd, options = options || {};
         if (collection == fullCol) {
           fullIndex = fullCol.indexOf(model);
           if (fullIndex >= pageStart && fullIndex < pageEnd) {
@@ -367,7 +412,9 @@ var PageableCollection = Backbone.Collection.extend({
           pageIndex = pageCol.indexOf(model);
           fullIndex = pageStart + pageIndex;
           colToAdd = fullCol;
-          var addAt = !_isUndefined(options.at) ? options.at + pageStart : fullIndex;
+          var addAt = !_isUndefined(options.at) ?
+            options.at + pageStart :
+            fullIndex;
         }
 
         if (!options.onRemove) {
@@ -381,7 +428,11 @@ var PageableCollection = Backbone.Collection.extend({
           colToAdd.add(model, _extend({}, options, {
             at: addAt
           }));
-          var modelToRemove = pageIndex >= pageSize ? model : !_isUndefined(options.at) && addAt < pageEnd && pageCol.length > pageSize ? pageCol.at(pageSize) : null;
+          var modelToRemove = pageIndex >= pageSize ?
+            model :
+            !_isUndefined(options.at) && addAt < pageEnd && pageCol.length > pageSize ?
+            pageCol.at(pageSize) :
+            null;
           if (modelToRemove) {
             runOnceAtLastHandler(collection, event, function () {
               pageCol.remove(modelToRemove, {
@@ -398,7 +449,7 @@ var PageableCollection = Backbone.Collection.extend({
       if (event == "remove") {
         if (!options.onAdd) {
           // decrement totalRecords and update totalPages and lastPage
-          if (! --state.totalRecords) {
+          if (!--state.totalRecords) {
             state.totalRecords = null;
             state.totalPages = null;
           } else {
@@ -408,8 +459,7 @@ var PageableCollection = Backbone.Collection.extend({
           }
           pageCol.state = pageCol._checkState(state);
 
-          var nextModel,
-              removedIndex = options.index;
+          var nextModel, removedIndex = options.index;
           if (collection == pageCol) {
             if (nextModel = fullCol.at(pageEnd)) {
               runOnceAtLastHandler(pageCol, event, function () {
@@ -418,9 +468,10 @@ var PageableCollection = Backbone.Collection.extend({
                 });
               });
             } else if (!pageCol.length && state.totalRecords) {
-              pageCol.reset(fullCol.models.slice(pageStart - pageSize, pageEnd - pageSize), _extend({}, options, {
-                parse: false
-              }));
+              pageCol.reset(fullCol.models.slice(pageStart - pageSize, pageEnd - pageSize),
+                _extend({}, options, {
+                  parse: false
+                }));
             }
             fullCol.remove(model);
           } else if (removedIndex >= pageStart && removedIndex < pageEnd) {
@@ -433,9 +484,10 @@ var PageableCollection = Backbone.Collection.extend({
             }
             pageCol.remove(model);
             if (!pageCol.length && state.totalRecords) {
-              pageCol.reset(fullCol.models.slice(pageStart - pageSize, pageEnd - pageSize), _extend({}, options, {
-                parse: false
-              }));
+              pageCol.reset(fullCol.models.slice(pageStart - pageSize, pageEnd - pageSize),
+                _extend({}, options, {
+                  parse: false
+                }));
             }
           }
         } else delete options.onAdd;
@@ -448,7 +500,8 @@ var PageableCollection = Backbone.Collection.extend({
         collection = model;
 
         // Reset that's not a result of getPage
-        if (collection == pageCol && options.from == null && options.to == null) {
+        if (collection == pageCol && options.from == null &&
+          options.to == null) {
           var head = fullCol.models.slice(0, pageStart);
           var tail = fullCol.models.slice(pageStart + pageCol.models.length);
           fullCol.reset(head.concat(pageCol.models).concat(tail), options);
@@ -464,9 +517,10 @@ var PageableCollection = Backbone.Collection.extend({
             pageEnd = pageStart + pageSize;
           }
           pageCol.state = pageCol._checkState(state);
-          pageCol.reset(fullCol.models.slice(pageStart, pageEnd), _extend({}, options, {
-            parse: false
-          }));
+          pageCol.reset(fullCol.models.slice(pageStart, pageEnd),
+            _extend({}, options, {
+              parse: false
+            }));
         }
 
         if (!options.silent) pageCol.trigger("pageable:state:change", pageCol.state);
@@ -476,9 +530,10 @@ var PageableCollection = Backbone.Collection.extend({
         options = collection;
         collection = model;
         if (collection === fullCol) {
-          pageCol.reset(fullCol.models.slice(pageStart, pageEnd), _extend({}, options, {
-            parse: false
-          }));
+          pageCol.reset(fullCol.models.slice(pageStart, pageEnd),
+            _extend({}, options, {
+              parse: false
+            }));
         }
       }
 
@@ -499,14 +554,18 @@ var PageableCollection = Backbone.Collection.extend({
      If `totalPages` is undefined or null, it is set to `totalRecords` /
      `pageSize`. `lastPage` is set according to whether `firstPage` is 0 or 1
      when no error occurs.
-      @private
-      @throws {TypeError} If `totalRecords`, `pageSize`, `currentPage` or
+
+     @private
+
+     @throws {TypeError} If `totalRecords`, `pageSize`, `currentPage` or
      `firstPage` is not a finite integer.
-      @throws {RangeError} If `pageSize`, `currentPage` or `firstPage` is out
+
+     @throws {RangeError} If `pageSize`, `currentPage` or `firstPage` is out
      of bounds.
-      @return {Object} Returns the `state` object if no error was found.
+
+     @return {Object} Returns the `state` object if no error was found.
   */
-  _checkState: function _checkState(state) {
+  _checkState: function (state) {
     var mode = this.mode;
     var links = this.links;
     var totalRecords = state.totalRecords;
@@ -515,7 +574,8 @@ var PageableCollection = Backbone.Collection.extend({
     var firstPage = state.firstPage;
     var totalPages = state.totalPages;
 
-    if (totalRecords != null && pageSize != null && currentPage != null && firstPage != null && (mode == "infinite" ? links : true)) {
+    if (totalRecords != null && pageSize != null && currentPage != null &&
+      firstPage != null && (mode == "infinite" ? links : true)) {
 
       totalRecords = finiteInt(totalRecords, "totalRecords");
       pageSize = finiteInt(pageSize, "pageSize");
@@ -538,8 +598,13 @@ var PageableCollection = Backbone.Collection.extend({
         if (!links[currentPage + '']) {
           throw new RangeError("No link found for page " + currentPage);
         }
-      } else if (currentPage < firstPage || totalPages > 0 && (firstPage ? currentPage > totalPages : currentPage >= totalPages)) {
-        throw new RangeError("`currentPage` must be firstPage <= currentPage " + (firstPage ? "<" : "<=") + " totalPages if " + firstPage + "-based. Got " + currentPage + '.');
+      } else if (currentPage < firstPage ||
+        (totalPages > 0 &&
+          (firstPage ? currentPage > totalPages : currentPage >= totalPages))) {
+        throw new RangeError("`currentPage` must be firstPage <= currentPage " +
+          (firstPage ? "<" : "<=") +
+          " totalPages if " + firstPage + "-based. Got " +
+          currentPage + '.');
       }
     }
 
@@ -548,34 +613,42 @@ var PageableCollection = Backbone.Collection.extend({
 
   /**
      Change the page size of this collection.
-      Under most if not all circumstances, you should call this method to
+
+     Under most if not all circumstances, you should call this method to
      change the page size of a pageable collection because it will keep the
      pagination state sane. By default, the method will recalculate the
      current page number to one that will retain the current page's models
      when increasing the page size. When decreasing the page size, this method
      will retain the last models to the current page that will fit into the
      smaller page size.
-      If `options.first` is true, changing the page size will also reset the
+
+     If `options.first` is true, changing the page size will also reset the
      current page back to the first page instead of trying to be smart.
-      For server mode operations, changing the page size will trigger a
+
+     For server mode operations, changing the page size will trigger a
      PageableCollection#fetch and subsequently a `reset` event.
-      For client mode operations, changing the page size will `reset` the
+
+     For client mode operations, changing the page size will `reset` the
      current page by recalculating the current page boundary on the client
      side.
-      If `options.fetch` is true, a fetch can be forced if the collection is in
+
+     If `options.fetch` is true, a fetch can be forced if the collection is in
      client mode.
-      @param {number} pageSize - The new page size to set to PageableCollection#state.
+
+     @param {number} pageSize - The new page size to set to PageableCollection#state.
      @param {Object} options - {@link PageableCollection#fetch} options.
      @param {boolean} options.first = false 0 Reset the current page number to
      the first page if `true`.
      @param {boolean} options.fetch - If `true`, force a fetch in client mode.
-      @throws {TypeError} If `pageSize` is not a finite integer.
+
+     @throws {TypeError} If `pageSize` is not a finite integer.
      @throws {RangeError} If `pageSize` is less than 1.
-      @chainable
+
+     @chainable
      @return {XMLHttpRequest|PageableCollection} The XMLHttpRequest
      from fetch or this.
   */
-  setPageSize: function setPageSize(pageSize, options) {
+  setPageSize: function (pageSize, options) {
     pageSize = finiteInt(pageSize, "pageSize");
 
     options = options || {
@@ -584,7 +657,9 @@ var PageableCollection = Backbone.Collection.extend({
 
     var state = this.state;
     var totalPages = ceil(state.totalRecords / pageSize);
-    var currentPage = totalPages ? max(state.firstPage, floor(totalPages * state.currentPage / state.totalPages)) : state.firstPage;
+    var currentPage = totalPages ?
+      max(state.firstPage, floor(totalPages * state.currentPage / state.totalPages)) :
+      state.firstPage;
 
     state = this.state = this._checkState(_extend({}, state, {
       pageSize: pageSize,
@@ -597,28 +672,38 @@ var PageableCollection = Backbone.Collection.extend({
 
   /**
      Switching between client, server and infinite mode.
-      If switching from client to server mode, the #fullCollection is emptied
+
+     If switching from client to server mode, the #fullCollection is emptied
      first and then deleted and a fetch is immediately issued for the current
      page from the server. Pass `false` to `options.fetch` to skip fetching.
-      If switching to infinite mode, and if `options.models` is given for an
+
+     If switching to infinite mode, and if `options.models` is given for an
      array of models,PageableCollection#links will be populated with a URL per
      page, using the default URL for this collection.
-      If switching from server to client mode, all of the pages are immediately
+
+     If switching from server to client mode, all of the pages are immediately
      refetched. If you have too many pages, you can pass `false` to
      `options.fetch` to skip fetching.
-      If switching to any mode from infinite mode, thePageableCollection#links
+
+     If switching to any mode from infinite mode, thePageableCollection#links
      will be deleted.
-      @fires PageableCollection#pageable:state:change
-      @param {"server"|"client"|"infinite"} mode - The mode to switch to.
-      @param {Object} options
-      @param {boolean} options.fetch = true - If `false`, no fetching is done.
-      @param {boolean} options.resetState = true - If 'false', the state is not
+
+     @fires PageableCollection#pageable:state:change
+
+     @param {"server"|"client"|"infinite"} mode - The mode to switch to.
+
+     @param {Object} options
+
+     @param {boolean} options.fetch = true - If `false`, no fetching is done.
+
+     @param {boolean} options.resetState = true - If 'false', the state is not
      reset, but checked for sanity instead.
-      @chainable
+
+     @chainable
      @return {XMLHttpRequest|PageableCollection} The XMLHttpRequest
      from fetch or this if `options.fetch` is `false`.
   */
-  switchMode: function switchMode(mode, options) {
+  switchMode: function (mode, options) {
 
     if (!_contains(["server", "client", "infinite"], mode)) {
       throw new TypeError('`mode` must be one of "server", "client" or "infinite"');
@@ -629,14 +714,16 @@ var PageableCollection = Backbone.Collection.extend({
       resetState: true
     };
 
-    var state = this.state = options.resetState ? _clone(this._initState) : this._checkState(_extend({}, this.state));
+    var state = this.state = options.resetState ?
+      _clone(this._initState) :
+      this._checkState(_extend({}, this.state));
 
     this.mode = mode;
 
     var self = this;
     var fullCollection = this.fullCollection;
     var handlers = this._handlers = this._handlers || {},
-        handler;
+      handler;
     if (mode != "server" && !fullCollection) {
       fullCollection = this._makeFullCollection(options.models || [], options);
       fullCollection.pageableCollection = this;
@@ -671,14 +758,16 @@ var PageableCollection = Backbone.Collection.extend({
 
     if (!options.silent) this.trigger("pageable:state:change", state);
 
-    return options.fetch ? this.fetch(_omit(options, "fetch", "resetState")) : this;
+    return options.fetch ?
+      this.fetch(_omit(options, "fetch", "resetState")) :
+      this;
   },
 
   /**
      @return {boolean} `true` if this collection can page backward, `false`
      otherwise.
   */
-  hasPreviousPage: function hasPreviousPage() {
+  hasPreviousPage: function () {
     var state = this.state;
     var currentPage = state.currentPage;
     if (this.mode != "infinite") return currentPage > state.firstPage;
@@ -689,7 +778,7 @@ var PageableCollection = Backbone.Collection.extend({
      @return {boolean} `true` if this collection can page forward, `false`
      otherwise.
   */
-  hasNextPage: function hasNextPage() {
+  hasNextPage: function () {
     var state = this.state;
     var currentPage = this.state.currentPage;
     if (this.mode != "infinite") return currentPage < state.lastPage;
@@ -699,48 +788,56 @@ var PageableCollection = Backbone.Collection.extend({
   /**
      Fetch the first page in server mode, or reset the current page of this
      collection to the first page in client or infinite mode.
-      @param {Object} options {@linkPageableCollection#getPage} options.
-      @chainable
+
+     @param {Object} options {@linkPageableCollection#getPage} options.
+
+     @chainable
      @return {XMLHttpRequest|PageableCollection} The XMLHttpRequest
      from fetch or this.
   */
-  getFirstPage: function getFirstPage(options) {
+  getFirstPage: function (options) {
     return this.getPage("first", options);
   },
 
   /**
      Fetch the previous page in server mode, or reset the current page of this
      collection to the previous page in client or infinite mode.
-      @param {Object} options {@linkPageableCollection#getPage} options.
-      @chainable
+
+     @param {Object} options {@linkPageableCollection#getPage} options.
+
+     @chainable
      @return {XMLHttpRequest|PageableCollection} The XMLHttpRequest
      from fetch or this.
   */
-  getPreviousPage: function getPreviousPage(options) {
+  getPreviousPage: function (options) {
     return this.getPage("prev", options);
   },
 
   /**
      Fetch the next page in server mode, or reset the current page of this
      collection to the next page in client mode.
-      @param {Object} options {@linkPageableCollection#getPage} options.
-      @chainable
+
+     @param {Object} options {@linkPageableCollection#getPage} options.
+
+     @chainable
      @return {XMLHttpRequest|PageableCollection} The XMLHttpRequest
      from fetch or this.
   */
-  getNextPage: function getNextPage(options) {
+  getNextPage: function (options) {
     return this.getPage("next", options);
   },
 
   /**
      Fetch the last page in server mode, or reset the current page of this
      collection to the last page in client mode.
-      @param {Object} options {@linkPageableCollection#getPage} options.
-      @chainable
+
+     @param {Object} options {@linkPageableCollection#getPage} options.
+
+     @chainable
      @return {XMLHttpRequest|PageableCollection} The XMLHttpRequest
      from fetch or this.
   */
-  getLastPage: function getLastPage(options) {
+  getLastPage: function (options) {
     return this.getPage("last", options);
   },
 
@@ -755,53 +852,58 @@ var PageableCollection = Backbone.Collection.extend({
      page number, a fetch is made with the results **appended**
      toPageableCollection#fullCollection.  The current page will then be reset
      after fetching.
-      @fires PageableCollection#pageable:state:change
-      @param {number|string} index - The page index to go to, or the page name to
+
+     @fires PageableCollection#pageable:state:change
+
+     @param {number|string} index - The page index to go to, or the page name to
      look up fromPageableCollection#links in infinite mode.
      @param {Object} options - {@linkPageableCollection#fetch} options or
      [reset](http://backbonejs.org/#Collection-reset) options for client mode
      when `options.fetch` is `false`.
      @param {boolean} options.fetch = false - If true, force a
      {@linkPageableCollection#fetch} in client mode.
-      @throws {TypeError} If `index` is not a finite integer under server or
+
+     @throws {TypeError} If `index` is not a finite integer under server or
      client mode, or does not yield a URL fromPageableCollection#links under
      infinite mode.
-      @throws {RangeError} If `index` is out of bounds.
-      @chainable
+
+     @throws {RangeError} If `index` is out of bounds.
+
+     @chainable
      @return {XMLHttpRequest|PageableCollection} The XMLHttpRequest
      from fetch or this.
   */
-  getPage: function getPage(index, options) {
+  getPage: function (index, options) {
 
     var mode = this.mode,
-        fullCollection = this.fullCollection;
+      fullCollection = this.fullCollection;
 
     options = options || {
       fetch: false
     };
 
     var state = this.state,
-        firstPage = state.firstPage,
-        currentPage = state.currentPage,
-        lastPage = state.lastPage,
-        pageSize = state.pageSize;
+      firstPage = state.firstPage,
+      currentPage = state.currentPage,
+      lastPage = state.lastPage,
+      pageSize = state.pageSize;
 
     var pageNum = index;
     switch (index) {
-      case "first":
-        pageNum = firstPage;
-        break;
-      case "prev":
-        pageNum = currentPage - 1;
-        break;
-      case "next":
-        pageNum = currentPage + 1;
-        break;
-      case "last":
-        pageNum = lastPage;
-        break;
-      default:
-        pageNum = finiteInt(index, "index");
+    case "first":
+      pageNum = firstPage;
+      break;
+    case "prev":
+      pageNum = currentPage - 1;
+      break;
+    case "next":
+      pageNum = currentPage + 1;
+      break;
+    case "last":
+      pageNum = lastPage;
+      break;
+    default:
+      pageNum = finiteInt(index, "index");
     }
 
     this.state = this._checkState(_extend({}, state, {
@@ -812,8 +914,10 @@ var PageableCollection = Backbone.Collection.extend({
     options.from = currentPage, options.to = pageNum;
 
     var pageStart = (firstPage === 0 ? pageNum : pageNum - 1) * pageSize;
-    var pageModels = fullCollection && fullCollection.length ? fullCollection.models.slice(pageStart, pageStart + pageSize) : [];
-    if ((mode == "client" || mode == "infinite" && !_isEmpty(pageModels)) && !options.fetch) {
+    var pageModels = fullCollection && fullCollection.length ?
+      fullCollection.models.slice(pageStart, pageStart + pageSize) : [];
+    if ((mode == "client" || (mode == "infinite" && !_isEmpty(pageModels))) &&
+      !options.fetch) {
       this.reset(pageModels, _omit(options, "fetch"));
       return this;
     }
@@ -827,12 +931,14 @@ var PageableCollection = Backbone.Collection.extend({
      Fetch the page for the provided item offset in server mode, or reset the
      current page of this collection to the page for the provided item offset
      in client mode.
-      @param {Object} options {@linkPageableCollection#getPage} options.
-      @chainable
+
+     @param {Object} options {@linkPageableCollection#getPage} options.
+
+     @chainable
      @return {XMLHttpRequest|PageableCollection} The XMLHttpRequest
      from fetch or this.
   */
-  getPageByOffset: function getPageByOffset(offset, options) {
+  getPageByOffset: function (offset, options) {
     if (offset < 0) {
       throw new RangeError("`offset must be > 0`");
     }
@@ -846,12 +952,14 @@ var PageableCollection = Backbone.Collection.extend({
 
   /**
      Overidden to make `getPage` compatible with Zepto.
-      @param {string} method
+
+     @param {string} method
      @param {Backbone.Model|Backbone.Collection} model
      @param {Object} options
-      @return {XMLHttpRequest}
+
+     @return {XMLHttpRequest}
   */
-  sync: function sync(method, model, options) {
+  sync: function (method, model, options) {
     var self = this;
     if (self.mode == "infinite") {
       var success = options.success;
@@ -874,20 +982,23 @@ var PageableCollection = Backbone.Collection.extend({
   /**
      Parse pagination links from the server response. Only valid under
      infinite mode.
-      Given a response body and a XMLHttpRequest object, extract pagination
+
+     Given a response body and a XMLHttpRequest object, extract pagination
      links from them for infinite paging.
-      This default implementation parses the RFC 5988 `Link` header and extract
+
+     This default implementation parses the RFC 5988 `Link` header and extract
      3 links from it - `first`, `prev`, `next`. Any subclasses overriding this
      method __must__ return an object hash having only the keys
      above. However, simply returning a `next` link or an empty hash if there
      are no more links should be enough for most implementations.
-      @param {*} resp The deserialized response body.
+
+     @param {*} resp The deserialized response body.
      @param {Object} options
      @param {XMLHttpRequest} options.xhr - The XMLHttpRequest object for this
      response.
      @return {Object}
   */
-  parseLinks: function parseLinks(resp, options) {
+  parseLinks: function (resp, options) {
     var links = {};
     var linkHeader = options.xhr.getResponseHeader("Link");
     if (linkHeader) {
@@ -910,30 +1021,39 @@ var PageableCollection = Backbone.Collection.extend({
 
   /**
      Parse server response data.
-      This default implementation assumes the response data is in one of two
+
+     This default implementation assumes the response data is in one of two
      structures:
-          [
+
+         [
            {}, // Your new pagination state
            [{}, ...] // An array of JSON objects
          ]
-      Or,
-          [{}] // An array of JSON objects
-      The first structure is the preferred form because the pagination states
+
+     Or,
+
+         [{}] // An array of JSON objects
+
+     The first structure is the preferred form because the pagination states
      may have been updated on the server side, sending them down again allows
      this collection to update its states. If the response has a pagination
      state object, it is checked for errors.
-      The second structure is the
+
+     The second structure is the
      [Backbone.Collection#parse](http://backbonejs.org/#Collection-parse)
      default.
-      **Note:** this method has been further simplified since 1.1.7. While
+
+     **Note:** this method has been further simplified since 1.1.7. While
      existingPageableCollection#parse implementations will continue to work,
      new code is encouraged to overridePageableCollection#parseState
      andPageableCollection#parseRecords instead.
-      @param {Object} resp The deserialized response data from the server.
+
+     @param {Object} resp The deserialized response data from the server.
      @param {Object} the options for the ajax request
-      @return {Array.<Object>} An array of model objects
+
+     @return {Array.<Object>} An array of model objects
   */
-  parse: function parse(resp, options) {
+  parse: function (resp, options) {
     var newState = this.parseState(resp, _clone(this.queryParams), _clone(this.state), options);
     if (newState) this.state = this._checkState(_extend({}, this.state, newState));
     return this.parseRecords(resp, options);
@@ -942,34 +1062,42 @@ var PageableCollection = Backbone.Collection.extend({
   /**
      Parse server response for server pagination state updates. Not applicable
      under infinite mode.
-      This default implementation first checks whether the response has any
+
+     This default implementation first checks whether the response has any
      state object as documented inPageableCollection#parse. If it exists, a
      state object is returned by mapping the server state keys to this
      pageable collection instance's query parameter keys using `queryParams`.
-      It is __NOT__ neccessary to return a full state object complete with all
+
+     It is __NOT__ neccessary to return a full state object complete with all
      the mappings defined inPageableCollection#queryParams. Any state object
      resulted is merged with a copy of the current pageable collection state
      and checked for sanity before actually updating. Most of the time, simply
      providing a new `totalRecords` value is enough to trigger a full
      pagination state recalculation.
-          parseState: function (resp, queryParams, state, options) {
+
+         parseState: function (resp, queryParams, state, options) {
            return {totalRecords: resp.total_entries};
          }
-      If you want to use header fields use:
-          parseState: function (resp, queryParams, state, options) {
+
+     If you want to use header fields use:
+
+         parseState: function (resp, queryParams, state, options) {
              return {totalRecords: options.xhr.getResponseHeader("X-total")};
          }
-      This method __MUST__ return a new state object instead of directly
+
+     This method __MUST__ return a new state object instead of directly
      modifying the PageableCollection#state object. The behavior of directly
      modifying PageableCollection#state is undefined.
-      @param {Object} resp - The deserialized response data from the server.
+
+     @param {Object} resp - The deserialized response data from the server.
      @param {Object} queryParams - A copy of PageableCollection#queryParams.
      @param {Object} state - A copy of PageableCollection#state.
      @param {Object} options - The options passed through from
      `parse`. (backbone >= 0.9.10 only)
-      @return {Object} A new (partial) state object.
+
+     @return {Object} A new (partial) state object.
    */
-  parseState: function parseState(resp, queryParams, state, options) {
+  parseState: function (resp, queryParams, state, options) {
     if (resp && resp.length === 2 && _isObject(resp[0]) && _isArray(resp[1])) {
 
       var newState = _clone(state);
@@ -977,7 +1105,7 @@ var PageableCollection = Backbone.Collection.extend({
 
       _each(_pairs(_omit(queryParams, "directions")), function (kvp) {
         var k = kvp[0],
-            v = kvp[1];
+          v = kvp[1];
         var serverVal = serverState[v];
         if (!_isUndefined(serverVal) && !_.isNull(serverVal)) newState[k] = serverState[v];
       });
@@ -992,16 +1120,19 @@ var PageableCollection = Backbone.Collection.extend({
 
   /**
      Parse server response for an array of model objects.
-      This default implementation first checks whether the response has any
+
+     This default implementation first checks whether the response has any
      state object as documented inPageableCollection#parse. If it exists, the
      array of model objects is assumed to be the second element, otherwise the
      entire response is returned directly.
-      @param {Object} resp - The deserialized response data from the server.
+
+     @param {Object} resp - The deserialized response data from the server.
      @param {Object} options - The options passed through from the
      `parse`. (backbone >= 0.9.10 only)
-      @return {Array.<Object>} An array of model objects
+
+     @return {Array.<Object>} An array of model objects
    */
-  parseRecords: function parseRecords(resp, options) {
+  parseRecords: function (resp, options) {
     if (resp && resp.length === 2 && _isObject(resp[0]) && _isArray(resp[1])) {
       return resp[1];
     }
@@ -1013,16 +1144,19 @@ var PageableCollection = Backbone.Collection.extend({
      Fetch a page from the server in server mode, or all the pages in client
      mode. Under infinite mode, the current page is refetched by default and
      then reset.
-      The query string is constructed by translating the current pagination
+
+     The query string is constructed by translating the current pagination
      state to your server API query parameter
      usingPageableCollection#queryParams. The current page will reset after
      fetch.
-      @param {Object} options - Accepts all
+
+     @param {Object} options - Accepts all
      [Backbone.Collection#fetch](http://backbonejs.org/#Collection-fetch)
      options.
-      @return {XMLHttpRequest}
+
+     @return {XMLHttpRequest}
   */
-  fetch: function fetch(options) {
+  fetch: function (options) {
 
     options = options || {};
 
@@ -1049,7 +1183,10 @@ var PageableCollection = Backbone.Collection.extend({
     options.data = data;
 
     // map params except directions
-    var queryParams = this.mode == "client" ? _pick(this.queryParams, "sortKey", "order") : _omit(_pick(this.queryParams, _keys(PageableProto.queryParams)), "directions");
+    var queryParams = this.mode == "client" ?
+      _pick(this.queryParams, "sortKey", "order") :
+      _omit(_pick(this.queryParams, _keys(PageableProto.queryParams)),
+        "directions");
 
     var thisCopy = _.clone(this);
     _.each(queryParams, function (v, k) {
@@ -1062,7 +1199,9 @@ var PageableCollection = Backbone.Collection.extend({
     // fix up sorting parameters
     var i;
     if (state.sortKey && state.order) {
-      var o = _isFunction(queryParams.order) ? queryParams.order.call(thisCopy) : queryParams.order;
+      var o = _isFunction(queryParams.order) ?
+        queryParams.order.call(thisCopy) :
+        queryParams.order;
       if (!_isArray(state.order)) {
         data[o] = this.queryParams.directions[state.order + ""];
       } else {
@@ -1074,9 +1213,10 @@ var PageableCollection = Backbone.Collection.extend({
     } else if (!state.sortKey) delete data[queryParams.order];
 
     // map extra query parameters
-    var extraKvps = _pairs(_omit(this.queryParams, _keys(PageableProto.queryParams))),
-        kvp,
-        v;
+    var extraKvps = _pairs(_omit(this.queryParams,
+        _keys(PageableProto.queryParams))),
+      kvp,
+      v;
     for (i = 0; i < extraKvps.length; i++) {
       kvp = extraKvps[i];
       v = kvp[1];
@@ -1086,21 +1226,24 @@ var PageableCollection = Backbone.Collection.extend({
 
     if (mode != "server") {
       var self = this,
-          fullCol = this.fullCollection;
+        fullCol = this.fullCollection;
       var success = options.success;
       options.success = function (col, resp, opts) {
 
         // make sure the caller's intent is obeyed
         opts = opts || {};
-        if (_isUndefined(options.silent)) delete opts.silent;else opts.silent = options.silent;
+        if (_isUndefined(options.silent)) delete opts.silent;
+        else opts.silent = options.silent;
 
         var models = col.models;
-        if (mode == "client") fullCol.reset(models, opts);else {
+        if (mode == "client") fullCol.reset(models, opts);
+        else {
           fullCol.add(models, _extend({
-            at: fullCol.length
-          }, _extend(opts, {
-            parse: false
-          })));
+              at: fullCol.length
+            },
+            _extend(opts, {
+              parse: false
+            })));
           self.trigger("reset", self, opts);
         }
 
@@ -1119,7 +1262,8 @@ var PageableCollection = Backbone.Collection.extend({
   /**
      Convenient method for making a `comparator` sorted by a model attribute
      identified by `sortKey` and ordered by `order`.
-      Like a Backbone.Collection, a PageableCollection will maintain the
+
+     Like a Backbone.Collection, a PageableCollection will maintain the
      __current page__ in sorted order on the client side if a `comparator` is
      attached to it. If the collection is in client mode, you can attach a
      comparator toPageableCollection#fullCollection to have all the pages
@@ -1127,20 +1271,24 @@ var PageableCollection = Backbone.Collection.extend({
      `true`. You __must__ call `sort` manually
      orPageableCollection#fullCollection.sort after calling this method to
      force a resort.
-      While you can use this method to sort the current page in server mode,
+
+     While you can use this method to sort the current page in server mode,
      the sorting order may not reflect the global sorting order due to the
      additions or removals of the records on the server since the last
      fetch. If you want the most updated page in a global sorting order, it is
      recommended that you set PageableCollection#state.sortKey and optionally
      PageableCollection#state.order, and then callPageableCollection#fetch.
-      @protected
-      @param {string} sortKey = this.state.sortKey - See `state.sortKey`.
+
+     @protected
+
+     @param {string} sortKey = this.state.sortKey - See `state.sortKey`.
      @param {number} order = this.state.order - See `state.order`.
      @param {(function(Backbone.Model, string): Object) | string} sortValue -
      See PageableCollection#setSorting.
-      See [Backbone.Collection.comparator](http://backbonejs.org/#Collection-comparator).
+
+     See [Backbone.Collection.comparator](http://backbonejs.org/#Collection-comparator).
   */
-  _makeComparator: function _makeComparator(sortKey, order, sortValue) {
+  _makeComparator: function (sortKey, order, sortValue) {
     var state = this.state;
 
     sortKey = sortKey || state.sortKey;
@@ -1148,35 +1296,40 @@ var PageableCollection = Backbone.Collection.extend({
 
     if (!sortKey || !order) return;
 
-    if (!sortValue) sortValue = function sortValue(model, attr) {
+    if (!sortValue) sortValue = function (model, attr) {
       return model.get(attr);
     };
 
     return function (left, right) {
       var l = sortValue(left, sortKey),
-          r = sortValue(right, sortKey),
-          t;
+        r = sortValue(right, sortKey),
+        t;
       if (order === 1) t = l, l = r, r = t;
-      if (l === r) return 0;else if (l < r) return -1;
+      if (l === r) return 0;
+      else if (l < r) return -1;
       return 1;
     };
   },
 
   /**
      Adjusts the sorting for this pageable collection.
-      Given a `sortKey` and an `order`, sets `state.sortKey` and
+
+     Given a `sortKey` and an `order`, sets `state.sortKey` and
      `state.order`. A comparator can be applied on the client side to sort in
      the order defined if `options.side` is `"client"`. By default the
      comparator is applied to thePageableCollection#fullCollection. Set
      `options.full` to `false` to apply a comparator to the current page under
      any mode. Setting `sortKey` to `null` removes the comparator from both
      the current page and the full collection.
-      If a `sortValue` function is given, it will be passed the `(model,
+
+     If a `sortValue` function is given, it will be passed the `(model,
      sortKey)` arguments and is used to extract a value from the model during
      comparison sorts. If `sortValue` is not given, `model.get(sortKey)` is
      used for sorting.
-      @chainable
-      @param {string} sortKey - See `state.sortKey`.
+
+     @chainable
+
+     @param {string} sortKey - See `state.sortKey`.
      @param {number} order=this.state.order - See `state.order`.
      @param {Object} options
      @param {string} options.side - By default, `"client"` if `mode` is
@@ -1184,7 +1337,7 @@ var PageableCollection = Backbone.Collection.extend({
      @param {boolean} options.full = true
      @param {(function(Backbone.Model, string): Object) | string} options.sortValue
   */
-  setSorting: function setSorting(sortKey, order, options) {
+  setSorting: function (sortKey, order, options) {
 
     var state = this.state;
 
@@ -1194,20 +1347,21 @@ var PageableCollection = Backbone.Collection.extend({
     var fullCollection = this.fullCollection;
 
     var delComp = false,
-        delFullComp = false;
+      delFullComp = false;
 
     if (!sortKey) delComp = delFullComp = true;
 
     var mode = this.mode;
     options = _extend({
-      side: mode == "client" ? mode : "server",
-      full: true
-    }, options);
+        side: mode == "client" ? mode : "server",
+        full: true
+      },
+      options);
 
     var comparator = this._makeComparator(sortKey, order, options.sortValue);
 
     var full = options.full,
-        side = options.side;
+      side = options.side;
 
     if (side == "client") {
       if (full) {
@@ -1268,7 +1422,7 @@ var Backgrid$2 = {
   VERSION: '0.3.7-es6',
   Extension: {},
 
-  resolveNameToClass: function resolveNameToClass(name, suffix) {
+  resolveNameToClass: function (name, suffix) {
     if (_.isString(name)) {
       var key = _.map(name.split('-'), function (e) {
         return e.slice(0, 1).toUpperCase() + e.slice(1);
@@ -1283,7 +1437,7 @@ var Backgrid$2 = {
     return name;
   },
 
-  callByNeed: function callByNeed() {
+  callByNeed: function () {
     var value = arguments[0];
     if (!_.isFunction(value)) return value;
 
@@ -1307,7 +1461,7 @@ _.extend(Backgrid$2, Backbone.Events);
    @class Backgrid.Command
    @constructor
  */
-var Command = function Command(evt) {
+var Command = function (evt) {
   _.extend(this, {
     altKey: !!evt.altKey,
     "char": evt["char"],
@@ -1327,52 +1481,60 @@ var Command = function Command(evt) {
 _.extend(Command.prototype, {
   /**
      Up Arrow
-      @member Backgrid.Command
+
+     @member Backgrid.Command
    */
-  moveUp: function moveUp() {
+  moveUp: function () {
     return this.keyCode == 38;
   },
   /**
      Down Arrow
-      @member Backgrid.Command
+
+     @member Backgrid.Command
    */
-  moveDown: function moveDown() {
+  moveDown: function () {
     return this.keyCode === 40;
   },
   /**
      Shift Tab
-      @member Backgrid.Command
+
+     @member Backgrid.Command
    */
-  moveLeft: function moveLeft() {
+  moveLeft: function () {
     return this.shiftKey && this.keyCode === 9;
   },
   /**
      Tab
-      @member Backgrid.Command
+
+     @member Backgrid.Command
    */
-  moveRight: function moveRight() {
+  moveRight: function () {
     return !this.shiftKey && this.keyCode === 9;
   },
   /**
      Enter
-      @member Backgrid.Command
+
+     @member Backgrid.Command
    */
-  save: function save() {
+  save: function () {
     return this.keyCode === 13;
   },
   /**
      Esc
-      @member Backgrid.Command
+
+     @member Backgrid.Command
    */
-  cancel: function cancel() {
+  cancel: function () {
     return this.keyCode === 27;
   },
   /**
      None of the above.
-      @member Backgrid.Command
+
+     @member Backgrid.Command
    */
-  passThru: function passThru() {
-    return !(this.moveUp() || this.moveDown() || this.moveLeft() || this.moveRight() || this.save() || this.cancel());
+  passThru: function () {
+    return !(this.moveUp() || this.moveDown() || this.moveLeft() ||
+      this.moveRight() || this.save() || this.cancel());
   }
 });
 
@@ -1395,33 +1557,36 @@ _.extend(Command.prototype, {
    @class Backgrid.CellFormatter
    @constructor
 */
-var CellFormatter = function CellFormatter() {};
+var CellFormatter = function () {};
 _.extend(CellFormatter.prototype, {
 
   /**
      Takes a raw value from a model and returns an optionally formatted string
      for display. The default implementation simply returns the supplied value
      as is without any type conversion.
-      @member Backgrid.CellFormatter
+
+     @member Backgrid.CellFormatter
      @param {*} rawData
      @param {Backbone.Model} model Used for more complicated formatting
      @return {*}
   */
-  fromRaw: function fromRaw(rawData, model) {
+  fromRaw: function (rawData, model) {
     return rawData;
   },
 
   /**
      Takes a formatted string, usually from user input, and returns a
      appropriately typed value for persistence in the model.
-      If the user input is invalid or unable to be converted to a raw value
+
+     If the user input is invalid or unable to be converted to a raw value
      suitable for persistence in the model, toRaw must return `undefined`.
-      @member Backgrid.CellFormatter
+
+     @member Backgrid.CellFormatter
      @param {string} formattedData
      @param {Backbone.Model} model Used for more complicated formatting
      @return {*|undefined}
   */
-  toRaw: function toRaw(formattedData, model) {
+  toRaw: function (formattedData, model) {
     return formattedData;
   }
 
@@ -1436,7 +1601,7 @@ _.extend(CellFormatter.prototype, {
    @constructor
    @throws {RangeError} If decimals < 0 or > 20.
 */
-var NumberFormatter = function NumberFormatter(options) {
+var NumberFormatter = function (options) {
   _.extend(this, this.defaults, options || {});
 
   if (this.decimals < 0 || this.decimals > 20) {
@@ -1449,10 +1614,13 @@ _.extend(NumberFormatter.prototype, {
   /**
      @member Backgrid.NumberFormatter
      @cfg {Object} options
-      @cfg {number} [options.decimals=2] Number of decimals to display. Must be an integer.
-      @cfg {string} [options.decimalSeparator='.'] The separator to use when
+
+     @cfg {number} [options.decimals=2] Number of decimals to display. Must be an integer.
+
+     @cfg {string} [options.decimalSeparator='.'] The separator to use when
      displaying decimals.
-      @cfg {string} [options.orderSeparator=','] The separator to use to
+
+     @cfg {string} [options.orderSeparator=','] The separator to use to
      separator thousands. May be an empty string.
    */
   defaults: {
@@ -1468,12 +1636,13 @@ _.extend(NumberFormatter.prototype, {
      every thousand is separated by `orderSeparator`, with a `decimal` number of
      decimals separated by `decimalSeparator`. The number returned is rounded
      the usual way.
-      @member Backgrid.NumberFormatter
+
+     @member Backgrid.NumberFormatter
      @param {number} number
      @param {Backbone.Model} model Used for more complicated formatting
      @return {string}
   */
-  fromRaw: function fromRaw(number, model) {
+  fromRaw: function (number, model) {
     if (_.isNull(number) || _.isUndefined(number)) return '';
 
     number = parseFloat(number).toFixed(~~this.decimals);
@@ -1488,13 +1657,14 @@ _.extend(NumberFormatter.prototype, {
   /**
      Takes a string, possibly formatted with `orderSeparator` and/or
      `decimalSeparator`, and convert it back to a number.
-      @member Backgrid.NumberFormatter
+
+     @member Backgrid.NumberFormatter
      @param {string} formattedData
      @param {Backbone.Model} model Used for more complicated formatting
      @return {number|undefined} Undefined if the string cannot be converted to
      a number.
   */
-  toRaw: function toRaw(formattedData, model) {
+  toRaw: function (formattedData, model) {
     formattedData = formattedData.trim();
 
     if (formattedData === '') return null;
@@ -1531,60 +1701,66 @@ _.extend(NumberFormatter.prototype, {
    @constructor
    @throws {RangeError} If decimals < 0 or > 20.
  */
-var PercentFormatter = function PercentFormatter() {
+var PercentFormatter = function () {
   Backgrid.NumberFormatter.apply(this, arguments);
 };
 
-PercentFormatter.prototype = new NumberFormatter(), _.extend(PercentFormatter.prototype, {
+PercentFormatter.prototype = new NumberFormatter(),
 
-  /**
-     @member Backgrid.PercentFormatter
-     @cfg {Object} options
-      @cfg {number} [options.multiplier=1] The number used to multiply the model
-     value for display.
-      @cfg {string} [options.symbol='%'] The symbol to append to the percentage
-     string.
-   */
-  defaults: _.extend({}, NumberFormatter.prototype.defaults, {
-    multiplier: 1,
-    symbol: "%"
-  }),
+  _.extend(PercentFormatter.prototype, {
 
-  /**
-     Takes a floating point number, where the number is first multiplied by
-     `multiplier`, then converted to a formatted string like
-     NumberFormatter#fromRaw, then finally append `symbol` to the end.
-      @member Backgrid.PercentFormatter
-     @param {number} rawValue
-     @param {Backbone.Model} model Used for more complicated formatting
-     @return {string}
-  */
-  fromRaw: function fromRaw(number, model) {
-    var args = [].slice.call(arguments, 1);
-    args.unshift(number * this.multiplier);
-    return (NumberFormatter.prototype.fromRaw.apply(this, args) || "0") + this.symbol;
-  },
+    /**
+       @member Backgrid.PercentFormatter
+       @cfg {Object} options
 
-  /**
-     Takes a string, possibly appended with `symbol` and/or `decimalSeparator`,
-     and convert it back to a number for the model like NumberFormatter#toRaw,
-     and then dividing it by `multiplier`.
-      @member Backgrid.PercentFormatter
-     @param {string} formattedData
-     @param {Backbone.Model} model Used for more complicated formatting
-     @return {number|undefined} Undefined if the string cannot be converted to
-     a number.
-  */
-  toRaw: function toRaw(formattedValue, model) {
-    var tokens = formattedValue.split(this.symbol);
-    if (tokens && tokens[0] && tokens[1] === "" || tokens[1] == null) {
-      var rawValue = NumberFormatter.prototype.toRaw.call(this, tokens[0]);
-      if (_.isUndefined(rawValue)) return rawValue;
-      return rawValue / this.multiplier;
+       @cfg {number} [options.multiplier=1] The number used to multiply the model
+       value for display.
+
+       @cfg {string} [options.symbol='%'] The symbol to append to the percentage
+       string.
+     */
+    defaults: _.extend({}, NumberFormatter.prototype.defaults, {
+      multiplier: 1,
+      symbol: "%"
+    }),
+
+    /**
+       Takes a floating point number, where the number is first multiplied by
+       `multiplier`, then converted to a formatted string like
+       NumberFormatter#fromRaw, then finally append `symbol` to the end.
+
+       @member Backgrid.PercentFormatter
+       @param {number} rawValue
+       @param {Backbone.Model} model Used for more complicated formatting
+       @return {string}
+    */
+    fromRaw: function (number, model) {
+      var args = [].slice.call(arguments, 1);
+      args.unshift(number * this.multiplier);
+      return (NumberFormatter.prototype.fromRaw.apply(this, args) || "0") + this.symbol;
+    },
+
+    /**
+       Takes a string, possibly appended with `symbol` and/or `decimalSeparator`,
+       and convert it back to a number for the model like NumberFormatter#toRaw,
+       and then dividing it by `multiplier`.
+
+       @member Backgrid.PercentFormatter
+       @param {string} formattedData
+       @param {Backbone.Model} model Used for more complicated formatting
+       @return {number|undefined} Undefined if the string cannot be converted to
+       a number.
+    */
+    toRaw: function (formattedValue, model) {
+      var tokens = formattedValue.split(this.symbol);
+      if (tokens && tokens[0] && tokens[1] === "" || tokens[1] == null) {
+        var rawValue = NumberFormatter.prototype.toRaw.call(this, tokens[0]);
+        if (_.isUndefined(rawValue)) return rawValue;
+        return rawValue / this.multiplier;
+      }
     }
-  }
 
-});
+  });
 
 /**
    Formatter to converts between various datetime formats.
@@ -1599,7 +1775,7 @@ PercentFormatter.prototype = new NumberFormatter(), _.extend(PercentFormatter.pr
    @constructor
    @throws {Error} If both `includeDate` and `includeTime` are false.
 */
-var DatetimeFormatter = function DatetimeFormatter(options) {
+var DatetimeFormatter = function (options) {
   _.extend(this, this.defaults, options || {});
 
   if (!this.includeDate && !this.includeTime) {
@@ -1611,12 +1787,16 @@ _.extend(DatetimeFormatter.prototype, {
 
   /**
      @member Backgrid.DatetimeFormatter
-      @cfg {Object} options
-      @cfg {boolean} [options.includeDate=true] Whether the values include the
+
+     @cfg {Object} options
+
+     @cfg {boolean} [options.includeDate=true] Whether the values include the
      date part.
-      @cfg {boolean} [options.includeTime=true] Whether the values include the
+
+     @cfg {boolean} [options.includeTime=true] Whether the values include the
      time part.
-      @cfg {boolean} [options.includeMilli=false] If `includeTime` is true,
+
+     @cfg {boolean} [options.includeMilli=false] If `includeTime` is true,
      whether to include the millisecond part, if it exists.
    */
   defaults: {
@@ -1629,11 +1809,10 @@ _.extend(DatetimeFormatter.prototype, {
   TIME_RE: /^(\d{2}):(\d{2}):(\d{2})(\.(\d{3}))?$/,
   ISO_SPLITTER_RE: /T|Z| +/,
 
-  _convert: function _convert(data, validate) {
+  _convert: function (data, validate) {
     if ((data + '').trim() === '') return null;
 
-    var date,
-        time = null;
+    var date, time = null;
     if (_.isNumber(data)) {
       var jsDate = new Date(data);
       date = lpad(jsDate.getUTCFullYear(), 4, 0) + '-' + lpad(jsDate.getUTCMonth() + 1, 2, 0) + '-' + lpad(jsDate.getUTCDate(), 2, 0);
@@ -1655,7 +1834,13 @@ _.extend(DatetimeFormatter.prototype, {
       if (!this.includeTime && time) return;
     }
 
-    var jsDate = new Date(Date.UTC(YYYYMMDD[1] * 1 || 0, YYYYMMDD[2] * 1 - 1 || 0, YYYYMMDD[3] * 1 || 0, HHmmssSSS[1] * 1 || null, HHmmssSSS[2] * 1 || null, HHmmssSSS[3] * 1 || null, HHmmssSSS[5] * 1 || null));
+    var jsDate = new Date(Date.UTC(YYYYMMDD[1] * 1 || 0,
+      YYYYMMDD[2] * 1 - 1 || 0,
+      YYYYMMDD[3] * 1 || 0,
+      HHmmssSSS[1] * 1 || null,
+      HHmmssSSS[2] * 1 || null,
+      HHmmssSSS[3] * 1 || null,
+      HHmmssSSS[5] * 1 || null));
 
     var result = '';
 
@@ -1681,13 +1866,14 @@ _.extend(DatetimeFormatter.prototype, {
   /**
      Converts an ISO-8601 formatted datetime string to a datetime string, date
      string or a time string. The timezone is ignored if supplied.
-      @member Backgrid.DatetimeFormatter
+
+     @member Backgrid.DatetimeFormatter
      @param {string} rawData
      @param {Backbone.Model} model Used for more complicated formatting
      @return {string|null|undefined} ISO-8601 string in UTC. Null and undefined
      values are returned as is.
   */
-  fromRaw: function fromRaw(rawData, model) {
+  fromRaw: function (rawData, model) {
     if (_.isNull(rawData) || _.isUndefined(rawData)) return '';
     return this._convert(rawData);
   },
@@ -1698,7 +1884,8 @@ _.extend(DatetimeFormatter.prototype, {
      parses the input values exactly the same way as
      Backgrid.Extension.MomentFormatter#fromRaw(), in addition to doing some
      sanity checks.
-      @member Backgrid.DatetimeFormatter
+
+     @member Backgrid.DatetimeFormatter
      @param {string} formattedData
      @param {Backbone.Model} model Used for more complicated formatting
      @return {string|undefined} ISO-8601 string in UTC. Undefined if a date is
@@ -1706,7 +1893,7 @@ _.extend(DatetimeFormatter.prototype, {
      false, or if `includeDate` is true and a date is not found, or if
      `includeTime` is true and a time is not found.
   */
-  toRaw: function toRaw(formattedData, model) {
+  toRaw: function (formattedData, model) {
     return this._convert(formattedData, true);
   }
 
@@ -1719,19 +1906,20 @@ _.extend(DatetimeFormatter.prototype, {
    @extends Backgrid.CellFormatter
    @constructor
  */
-var StringFormatter = function StringFormatter() {};
+var StringFormatter = function () {};
 StringFormatter.prototype = new CellFormatter();
 _.extend(StringFormatter.prototype, {
   /**
      Converts any value to a string using Ecmascript's implicit type
      conversion. If the given value is `null` or `undefined`, an empty string is
      returned instead.
-      @member Backgrid.StringFormatter
+
+     @member Backgrid.StringFormatter
      @param {*} rawValue
      @param {Backbone.Model} model Used for more complicated formatting
      @return {string}
    */
-  fromRaw: function fromRaw(rawValue, model) {
+  fromRaw: function (rawValue, model) {
     if (_.isUndefined(rawValue) || _.isNull(rawValue)) return '';
     return rawValue + '';
   }
@@ -1744,19 +1932,20 @@ _.extend(StringFormatter.prototype, {
    @extends Backgrid.CellFormatter
    @constructor
  */
-var EmailFormatter = function EmailFormatter() {};
+var EmailFormatter = function () {};
 EmailFormatter.prototype = new CellFormatter();
 _.extend(EmailFormatter.prototype, {
   /**
      Return the input if it is a string that contains an '@' character and if
      the strings before and after '@' are non-empty. If the input does not
      validate, `undefined` is returned.
-      @member Backgrid.EmailFormatter
+
+     @member Backgrid.EmailFormatter
      @param {*} formattedData
      @param {Backbone.Model} model Used for more complicated formatting
      @return {string|undefined}
    */
-  toRaw: function toRaw(formattedData, model) {
+  toRaw: function (formattedData, model) {
     var parts = formattedData.trim().split("@");
     if (parts.length === 2 && _.all(parts)) {
       return formattedData;
@@ -1776,20 +1965,21 @@ _.extend(EmailFormatter.prototype, {
    @extends Backgrid.CellFormatter
    @constructor
 */
-var SelectFormatter = function SelectFormatter() {};
+var SelectFormatter = function () {};
 SelectFormatter.prototype = new CellFormatter();
 _.extend(SelectFormatter.prototype, {
 
-   /**
-      Normalizes raw scalar or array values to an array.
-       @member Backgrid.SelectFormatter
-      @param {*} rawValue
-      @param {Backbone.Model} model Used for more complicated formatting
-      @return {Array.<*>}
-   */
-   fromRaw: function fromRaw(rawValue, model) {
-      return _.isArray(rawValue) ? rawValue : rawValue != null ? [rawValue] : [];
-   }
+  /**
+     Normalizes raw scalar or array values to an array.
+
+     @member Backgrid.SelectFormatter
+     @param {*} rawValue
+     @param {Backbone.Model} model Used for more complicated formatting
+     @return {Array.<*>}
+  */
+  fromRaw: function (rawValue, model) {
+    return _.isArray(rawValue) ? rawValue : rawValue != null ? [rawValue] : [];
+  }
 });
 
 /*
@@ -1820,28 +2010,31 @@ var HeaderCell = Backbone.View.extend({
 
   /**
      Initializer.
-      @param {Object} options
+
+     @param {Object} options
      @param {Backgrid.Column|Object} options.column
-      @throws {TypeError} If options.column or options.collection is undefined.
+
+     @throws {TypeError} If options.column or options.collection is undefined.
    */
-  initialize: function initialize(options) {
+  initialize: function (options) {
     this.column = options.column;
     if (!(this.column instanceof Column)) {
       this.column = new Column(this.column);
     }
 
     var column = this.column,
-        collection = this.collection,
-        $el = this.$el;
+      collection = this.collection,
+      $el = this.$el;
 
-    this.listenTo(column, "change:editable change:sortable change:renderable", function (column) {
-      var changed = column.changedAttributes();
-      for (var key in changed) {
-        if (changed.hasOwnProperty(key)) {
-          $el.toggleClass(key, changed[key]);
+    this.listenTo(column, "change:editable change:sortable change:renderable",
+      function (column) {
+        var changed = column.changedAttributes();
+        for (var key in changed) {
+          if (changed.hasOwnProperty(key)) {
+            $el.toggleClass(key, changed[key]);
+          }
         }
-      }
-    });
+      });
     this.listenTo(column, "change:direction", this.setCellDirection);
     this.listenTo(column, "change:name change:label", this.render);
 
@@ -1856,7 +2049,7 @@ var HeaderCell = Backbone.View.extend({
      Event handler for the collection's `backgrid:sorted` event. Removes
      all the CSS direction classes.
    */
-  removeCellDirection: function removeCellDirection() {
+  removeCellDirection: function () {
     this.$el.removeClass("ascending").removeClass("descending");
     this.column.set("direction", null);
   },
@@ -1867,7 +2060,7 @@ var HeaderCell = Backbone.View.extend({
      CSS class to the header cell. Removes all the CSS direction classes
      otherwise.
    */
-  setCellDirection: function setCellDirection(column, direction) {
+  setCellDirection: function (column, direction) {
     this.$el.removeClass("ascending").removeClass("descending");
     if (column.cid == this.column.cid) this.$el.addClass(direction);
   },
@@ -1877,7 +2070,7 @@ var HeaderCell = Backbone.View.extend({
      sortable, clicking on the anchor will cycle through 3 sorting orderings -
      `ascending`, `descending`, and default.
    */
-  onClick: function onClick(e) {
+  onClick: function (e) {
     e.preventDefault();
 
     var column = this.column;
@@ -1885,17 +2078,21 @@ var HeaderCell = Backbone.View.extend({
     var event = "backgrid:sort";
 
     function cycleSort(header, col) {
-      if (column.get("direction") === "ascending") collection.trigger(event, col, "descending");else if (column.get("direction") === "descending") collection.trigger(event, col, null);else collection.trigger(event, col, "ascending");
+      if (column.get("direction") === "ascending") collection.trigger(event, col, "descending");
+      else if (column.get("direction") === "descending") collection.trigger(event, col, null);
+      else collection.trigger(event, col, "ascending");
     }
 
     function toggleSort(header, col) {
-      if (column.get("direction") === "ascending") collection.trigger(event, col, "descending");else collection.trigger(event, col, "ascending");
+      if (column.get("direction") === "ascending") collection.trigger(event, col, "descending");
+      else collection.trigger(event, col, "ascending");
     }
 
     var sortable = Backgrid$2.callByNeed(column.sortable(), column, this.collection);
     if (sortable) {
       var sortType = column.get("sortType");
-      if (sortType === "toggle") toggleSort(this, column);else cycleSort(this, column);
+      if (sortType === "toggle") toggleSort(this, column);
+      else cycleSort(this, column);
     }
   },
 
@@ -1903,7 +2100,7 @@ var HeaderCell = Backbone.View.extend({
      Renders a header cell with a sorter, a label, and a class name for this
      column.
    */
-  render: function render() {
+  render: function () {
     this.$el.empty();
     var column = this.column;
     var sortable = Backgrid$2.callByNeed(column.sortable(), column, this.collection);
@@ -1948,51 +2145,65 @@ var Column = Backbone.Model.extend({
      values, you can either change the prototype directly to override
      Column.defaults globally or extend Column and supply the custom class to
      Backgrid.Grid:
-          // Override Column defaults globally
+
+         // Override Column defaults globally
          Column.prototype.defaults.sortable = false;
-          // Override Column defaults locally
+
+         // Override Column defaults locally
          var MyColumn = Column.extend({
            defaults: _.defaults({
              editable: false
            }, Column.prototype.defaults)
          });
-          var grid = new Backgrid.Grid(columns: new Columns([{...}, {...}], {
+
+         var grid = new Backgrid.Grid(columns: new Columns([{...}, {...}], {
            model: MyColumn
          }));
-      @cfg {string} [defaults.name] The default name of the model attribute.
-      @cfg {string} [defaults.label] The default label to show in the header.
-      @cfg {string|Backgrid.Cell} [defaults.cell] The default cell type. If this
+
+     @cfg {string} [defaults.name] The default name of the model attribute.
+
+     @cfg {string} [defaults.label] The default label to show in the header.
+
+     @cfg {string|Backgrid.Cell} [defaults.cell] The default cell type. If this
      is a string, the capitalized form will be used to look up a cell class in
      Backbone, i.e.: string => StringCell. If a Cell subclass is supplied, it is
      initialized with a hash of parameters. If a Cell instance is supplied, it
      is used directly.
-      @cfg {string|Backgrid.HeaderCell} [defaults.headerCell] The default header
+
+     @cfg {string|Backgrid.HeaderCell} [defaults.headerCell] The default header
      cell type.
-      @cfg {boolean|string|function(): boolean} [defaults.sortable=true] Whether
+
+     @cfg {boolean|string|function(): boolean} [defaults.sortable=true] Whether
      this column is sortable. If the value is a string, a method will the same
      name will be looked up from the column instance to determine whether the
      column should be sortable. The method's signature must be `function
      (Backgrid.Column, Backbone.Model): boolean`.
-      @cfg {boolean|string|function(): boolean} [defaults.editable=true] Whether
+
+     @cfg {boolean|string|function(): boolean} [defaults.editable=true] Whether
      this column is editable. If the value is a string, a method will the same
      name will be looked up from the column instance to determine whether the
      column should be editable. The method's signature must be `function
      (Backgrid.Column, Backbone.Model): boolean`.
-      @cfg {boolean|string|function(): boolean} [defaults.renderable=true]
+
+     @cfg {boolean|string|function(): boolean} [defaults.renderable=true]
      Whether this column is renderable. If the value is a string, a method will
      the same name will be looked up from the column instance to determine
      whether the column should be renderable. The method's signature must be
      `function (Backrid.Column, Backbone.Model): boolean`.
-      @cfg {Backgrid.CellFormatter | Object | string} [defaults.formatter] The
+
+     @cfg {Backgrid.CellFormatter | Object | string} [defaults.formatter] The
      formatter to use to convert between raw model values and user input.
-      @cfg {"toggle"|"cycle"} [defaults.sortType="cycle"] Whether sorting will
+
+     @cfg {"toggle"|"cycle"} [defaults.sortType="cycle"] Whether sorting will
      toggle between ascending and descending order, or cycle between insertion
      order, ascending and descending order.
-      @cfg {(function(Backbone.Model, string): *) | string} [defaults.sortValue]
+
+     @cfg {(function(Backbone.Model, string): *) | string} [defaults.sortValue]
      The function to use to extract a value from the model for comparison during
      sorting. If this value is a string, a method with the same name will be
      looked up from the column instance.
-      @cfg {"ascending"|"descending"|null} [defaults.direction=null] The initial
+
+     @cfg {"ascending"|"descending"|null} [defaults.direction=null] The initial
      sorting direction for this column. The default is ordered by
      Backbone.Model.cid, which usually means the collection is ordered by
      insertion order.
@@ -2013,28 +2224,43 @@ var Column = Backbone.Model.extend({
 
   /**
      Initializes this Column instance.
-      @param {Object} attrs
-      @param {string} attrs.name The model attribute this column is responsible
+
+     @param {Object} attrs
+
+     @param {string} attrs.name The model attribute this column is responsible
      for.
-      @param {string|Backgrid.Cell} attrs.cell The cell type to use to render
+
+     @param {string|Backgrid.Cell} attrs.cell The cell type to use to render
      this column.
-      @param {string} [attrs.label]
-      @param {string|Backgrid.HeaderCell} [attrs.headerCell]
-      @param {boolean|string|function(): boolean} [attrs.sortable=true]
-      @param {boolean|string|function(): boolean} [attrs.editable=true]
-      @param {boolean|string|function(): boolean} [attrs.renderable=true]
-      @param {Backgrid.CellFormatter | Object | string} [attrs.formatter]
-      @param {"toggle"|"cycle"}  [attrs.sortType="cycle"]
-      @param {(function(Backbone.Model, string): *) | string} [attrs.sortValue]
-      @throws {TypeError} If attrs.cell or attrs.options are not supplied.
-      @throws {ReferenceError} If formatter is a string but a formatter class of
+
+     @param {string} [attrs.label]
+
+     @param {string|Backgrid.HeaderCell} [attrs.headerCell]
+
+     @param {boolean|string|function(): boolean} [attrs.sortable=true]
+
+     @param {boolean|string|function(): boolean} [attrs.editable=true]
+
+     @param {boolean|string|function(): boolean} [attrs.renderable=true]
+
+     @param {Backgrid.CellFormatter | Object | string} [attrs.formatter]
+
+     @param {"toggle"|"cycle"}  [attrs.sortType="cycle"]
+
+     @param {(function(Backbone.Model, string): *) | string} [attrs.sortValue]
+
+     @throws {TypeError} If attrs.cell or attrs.options are not supplied.
+
+     @throws {ReferenceError} If formatter is a string but a formatter class of
      said name cannot be found in the Backgrid module.
-      See:
-      - Backgrid.Column.defaults
+
+     See:
+
+     - Backgrid.Column.defaults
      - Backgrid.Cell
      - Backgrid.CellFormatter
    */
-  initialize: function initialize() {
+  initialize: function () {
     if (!this.has("label")) {
       this.set({
         label: this.get("name")
@@ -2057,17 +2283,20 @@ var Column = Backbone.Model.extend({
 
   /**
      Returns an appropriate value extraction function from a model for sorting.
-      If the column model contains an attribute `sortValue`, if it is a string, a
+
+     If the column model contains an attribute `sortValue`, if it is a string, a
      method from the column instance identifified by the `sortValue` string is
      returned. If it is a function, it it returned as is. If `sortValue` isn't
      found from the column model's attributes, a default value extraction
      function is returned which will compare according to the natural order of
      the value's type.
-      @return {function(Backbone.Model, string): *}
+
+     @return {function(Backbone.Model, string): *}
    */
-  sortValue: function sortValue() {
+  sortValue: function () {
     var sortValue = this.get("sortValue");
-    if (_.isString(sortValue)) return this[sortValue];else if (_.isFunction(sortValue)) return sortValue;
+    if (_.isString(sortValue)) return this[sortValue];
+    else if (_.isFunction(sortValue)) return sortValue;
 
     return function (model, colName) {
       return model.get(colName);
@@ -2099,7 +2328,8 @@ var Column = Backbone.Model.extend({
 _.each(["sortable", "renderable", "editable"], function (key) {
   Column.prototype[key] = function () {
     var value = this.get(key);
-    if (_.isString(value)) return this[value];else if (_.isFunction(value)) return value;
+    if (_.isString(value)) return this[value];
+    else if (_.isFunction(value)) return value;
 
     return !!value;
   };
@@ -2125,14 +2355,16 @@ var CellEditor = Backbone.View.extend({
 
   /**
      Initializer.
-      @param {Object} options
+
+     @param {Object} options
      @param {Backgrid.CellFormatter} options.formatter
      @param {Backgrid.Column} options.column
      @param {Backbone.Model} options.model
-      @throws {TypeError} If `formatter` is not a formatter instance, or when
+
+     @throws {TypeError} If `formatter` is not a formatter instance, or when
      `model` or `column` are undefined.
   */
-  initialize: function initialize(options) {
+  initialize: function (options) {
     this.formatter = options.formatter;
     this.column = options.column;
     if (!(this.column instanceof Column)) {
@@ -2147,7 +2379,7 @@ var CellEditor = Backbone.View.extend({
      this default implementation. **Should** be called by Cell classes after
      calling Backgrid.CellEditor#render.
   */
-  postRender: function postRender(model, column) {
+  postRender: function (model, column) {
     if (column == null || column.get("name") == this.column.get("name")) {
       this.$el.focus();
     }
@@ -2175,24 +2407,26 @@ var SelectCellEditor = CellEditor.extend({
   },
 
   /** @property {function(Object, ?Object=): string} template */
-  template: _.template('<option value="<%- value %>" <%= selected ? \'selected="selected"\' : "" %>><%- text %></option>', null, {
-    variable: null,
-    evaluate: /<%([\s\S]+?)%>/g,
-    interpolate: /<%=([\s\S]+?)%>/g,
-    escape: /<%-([\s\S]+?)%>/g
-  }),
+  template: _.template(
+    '<option value="<%- value %>" <%= selected ? \'selected="selected"\' : "" %>><%- text %></option>',
+    null, {
+      variable: null,
+      evaluate: /<%([\s\S]+?)%>/g,
+      interpolate: /<%=([\s\S]+?)%>/g,
+      escape: /<%-([\s\S]+?)%>/g
+    }),
 
-  setOptionValues: function setOptionValues(optionValues) {
+  setOptionValues: function (optionValues) {
     this.optionValues = optionValues;
     this.optionValues = _.result(this, "optionValues");
   },
 
-  setMultiple: function setMultiple(multiple) {
+  setMultiple: function (multiple) {
     this.multiple = multiple;
     this.$el.prop("multiple", multiple);
   },
 
-  _renderOptions: function _renderOptions(nvps, selectedValues) {
+  _renderOptions: function (nvps, selectedValues) {
     var options = '';
     for (var i = 0; i < nvps.length; i++) {
       options = options + this.template({
@@ -2211,7 +2445,7 @@ var SelectCellEditor = CellEditor.extend({
      option value. If `optionValues` is a function, it is called without a
      parameter.
   */
-  render: function render() {
+  render: function () {
     this.$el.empty();
 
     var optionValues = _.result(this, "optionValues");
@@ -2258,7 +2492,7 @@ var SelectCellEditor = CellEditor.extend({
   /**
      Saves the value of the selected option to the model attribute.
   */
-  save: function save(e) {
+  save: function (e) {
     var model = this.model;
     var column = this.column;
     model.set(column.get("name"), this.formatter.toRaw(this.$el.val(), model));
@@ -2268,14 +2502,15 @@ var SelectCellEditor = CellEditor.extend({
      Triggers a `backgrid:edited` event from the model so the body can close
      this editor.
   */
-  close: function close(e) {
+  close: function (e) {
     var model = this.model;
     var column = this.column;
     var command = new Command(e);
     if (command.cancel()) {
       e.stopPropagation();
       model.trigger("backgrid:edited", model, column, new Command(e));
-    } else if (command.save() || command.moveLeft() || command.moveRight() || command.moveUp() || command.moveDown() || e.type == "blur") {
+    } else if (command.save() || command.moveLeft() || command.moveRight() ||
+      command.moveUp() || command.moveDown() || e.type == "blur") {
       e.preventDefault();
       e.stopPropagation();
       this.save(e);
@@ -2312,13 +2547,14 @@ var InputCellEditor = CellEditor.extend({
   /**
      Initializer. Removes this `el` from the DOM when a `done` event is
      triggered.
-      @param {Object} options
+
+     @param {Object} options
      @param {Backgrid.CellFormatter} options.formatter
      @param {Backgrid.Column} options.column
      @param {Backbone.Model} options.model
      @param {string} [options.placeholder]
   */
-  initialize: function initialize(options) {
+  initialize: function (options) {
     InputCellEditor.__super__.initialize.apply(this, arguments);
 
     if (options.placeholder) {
@@ -2330,7 +2566,7 @@ var InputCellEditor = CellEditor.extend({
      Renders a text input with the cell value formatted for display, if it
      exists.
   */
-  render: function render() {
+  render: function () {
     var model = this.model;
     this.$el.val(this.formatter.fromRaw(model.get(this.column.get("name")), model));
     return this;
@@ -2339,17 +2575,21 @@ var InputCellEditor = CellEditor.extend({
   /**
      If the key pressed is `enter`, `tab`, `up`, or `down`, converts the value
      in the editor to a raw value for saving into the model using the formatter.
-      If the key pressed is `esc` the changes are undone.
-      If the editor goes out of focus (`blur`) but the value is invalid, the
+
+     If the key pressed is `esc` the changes are undone.
+
+     If the editor goes out of focus (`blur`) but the value is invalid, the
      event is intercepted and cancelled so the cell remains in focus pending for
      further action. The changes are saved otherwise.
-      Triggers a Backbone `backgrid:edited` event from the model when successful,
+
+     Triggers a Backbone `backgrid:edited` event from the model when successful,
      and `backgrid:error` if the value cannot be converted. Classes listening to
      the `error` event, usually the Cell classes, should respond appropriately,
      usually by rendering some kind of error feedback.
-      @param {Event} e
+
+     @param {Event} e
   */
-  saveOrCancel: function saveOrCancel(e) {
+  saveOrCancel: function (e) {
 
     var formatter = this.formatter;
     var model = this.model;
@@ -2358,7 +2598,8 @@ var InputCellEditor = CellEditor.extend({
     var command = new Command(e);
     var blurred = e.type === "blur";
 
-    if (command.moveUp() || command.moveDown() || command.moveLeft() || command.moveRight() || command.save() || blurred) {
+    if (command.moveUp() || command.moveDown() || command.moveLeft() || command.moveRight() ||
+      command.save() || blurred) {
 
       e.preventDefault();
       e.stopPropagation();
@@ -2374,13 +2615,13 @@ var InputCellEditor = CellEditor.extend({
     }
     // esc
     else if (command.cancel()) {
-        // undo
-        e.stopPropagation();
-        model.trigger("backgrid:edited", model, column, command);
-      }
+      // undo
+      e.stopPropagation();
+      model.trigger("backgrid:edited", model, column, command);
+    }
   },
 
-  postRender: function postRender(model, column) {
+  postRender: function (model, column) {
     if (column == null || column.get("name") == this.column.get("name")) {
       // move the cursor to the end on firefox if text is right aligned
       if (this.$el.css("text-align") === "right") {
@@ -2412,11 +2653,11 @@ var BooleanCellEditor = CellEditor.extend({
 
   /** @property */
   events: {
-    "mousedown": function mousedown() {
+    "mousedown": function () {
       this.mouseDown = true;
     },
     "blur": "enterOrExitEditMode",
-    "mouseup": function mouseup() {
+    "mouseup": function () {
       this.mouseDown = false;
     },
     "change": "saveOrCancel",
@@ -2427,7 +2668,7 @@ var BooleanCellEditor = CellEditor.extend({
      Renders a checkbox and check it if the model value of this column is true,
      uncheck otherwise.
   */
-  render: function render() {
+  render: function () {
     var model = this.model;
     var val = this.formatter.fromRaw(model.get(this.column.get("name")), model);
     this.$el.prop("checked", val);
@@ -2438,7 +2679,7 @@ var BooleanCellEditor = CellEditor.extend({
      Event handler. Hack to deal with the case where `blur` is fired before
      `change` and `click` on a checkbox.
   */
-  enterOrExitEditMode: function enterOrExitEditMode(e) {
+  enterOrExitEditMode: function (e) {
     if (!this.mouseDown) {
       var model = this.model;
       model.trigger("backgrid:edited", model, this.column, new Command(e));
@@ -2450,7 +2691,7 @@ var BooleanCellEditor = CellEditor.extend({
      one of the keyboard navigation key presses. Exit edit mode without saving
      if `escape` was pressed.
   */
-  saveOrCancel: function saveOrCancel(e) {
+  saveOrCancel: function (e) {
     var model = this.model;
     var column = this.column;
     var formatter = this.formatter;
@@ -2463,7 +2704,8 @@ var BooleanCellEditor = CellEditor.extend({
     }
 
     var $el = this.$el;
-    if (command.save() || command.moveLeft() || command.moveRight() || command.moveUp() || command.moveDown()) {
+    if (command.save() || command.moveLeft() || command.moveRight() || command.moveUp() ||
+      command.moveDown()) {
       e.preventDefault();
       e.stopPropagation();
       var val = formatter.toRaw($el.prop("checked"), model);
@@ -2504,7 +2746,8 @@ var Cell = Backgrid$2.Cell = Backbone.View.extend({
      @property {Backgrid.CellEditor} [editor=Backgrid.InputCellEditor] The
      default editor for all cell instances of this class. This value must be a
      class, it will be automatically instantiated upon entering edit mode.
-      See Backgrid.CellEditor
+
+     See Backgrid.CellEditor
   */
   editor: InputCellEditor,
 
@@ -2515,23 +2758,26 @@ var Cell = Backgrid$2.Cell = Backbone.View.extend({
 
   /**
      Initializer.
-      @param {Object} options
+
+     @param {Object} options
      @param {Backbone.Model} options.model
      @param {Backgrid.Column} options.column
-      @throws {ReferenceError} If formatter is a string but a formatter class of
+
+     @throws {ReferenceError} If formatter is a string but a formatter class of
      said name cannot be found in the Backgrid module.
   */
-  initialize: function initialize(options) {
+  initialize: function (options) {
     this.column = options.column;
     if (!(this.column instanceof Column)) {
       this.column = new Column(this.column);
     }
 
     var column = this.column,
-        model = this.model,
-        $el = this.$el;
+      model = this.model,
+      $el = this.$el;
 
-    var formatter = Backgrid$2.resolveNameToClass(column.get("formatter") || this.formatter, "Formatter");
+    var formatter = Backgrid$2.resolveNameToClass(column.get("formatter") ||
+      this.formatter, "Formatter");
 
     if (!_.isFunction(formatter.fromRaw) && !_.isFunction(formatter.toRaw)) {
       formatter = new formatter();
@@ -2547,19 +2793,20 @@ var Cell = Backgrid$2.Cell = Backbone.View.extend({
 
     this.listenTo(model, "backgrid:error", this.renderError);
 
-    this.listenTo(column, "change:editable change:sortable change:renderable", function (column) {
-      var changed = column.changedAttributes();
-      for (var key in changed) {
-        if (changed.hasOwnProperty(key)) {
-          $el.toggleClass(key, changed[key]);
+    this.listenTo(column, "change:editable change:sortable change:renderable",
+      function (column) {
+        var changed = column.changedAttributes();
+        for (var key in changed) {
+          if (changed.hasOwnProperty(key)) {
+            $el.toggleClass(key, changed[key]);
+          }
         }
-      }
-    });
+      });
 
     this.updateStateClassesMaybe();
   },
 
-  updateStateClassesMaybe: function updateStateClassesMaybe() {
+  updateStateClassesMaybe: function () {
     var model = this.model;
     var column = this.column;
     var $el = this.$el;
@@ -2572,7 +2819,7 @@ var Cell = Backgrid$2.Cell = Backbone.View.extend({
      Render a text string in a table cell. The text is converted from the
      model's raw value for this cell's column.
   */
-  render: function render() {
+  render: function () {
     var $el = this.$el;
     $el.empty();
     var model = this.model;
@@ -2588,19 +2835,22 @@ var Cell = Backgrid$2.Cell = Backbone.View.extend({
      If this column is editable, a new CellEditor instance is instantiated with
      its required parameters. An `editor` CSS class is added to the cell upon
      entering edit mode.
-      This method triggers a Backbone `backgrid:edit` event from the model when
+
+     This method triggers a Backbone `backgrid:edit` event from the model when
      the cell is entering edit mode and an editor instance has been constructed,
      but before it is rendered and inserted into the DOM. The cell and the
      constructed cell editor instance are sent as event parameters when this
      event is triggered.
-      When this cell has finished switching to edit mode, a Backbone
+
+     When this cell has finished switching to edit mode, a Backbone
      `backgrid:editing` event is triggered from the model. The cell and the
      constructed cell instance are also sent as parameters in the event.
-      When the model triggers a `backgrid:error` event, it means the editor is
+
+     When the model triggers a `backgrid:error` event, it means the editor is
      unable to convert the current user input to an apprpriate value for the
      model's column, and an `error` CSS class is added to the cell accordingly.
   */
-  enterEditMode: function enterEditMode() {
+  enterEditMode: function () {
     var model = this.model;
     var column = this.column;
 
@@ -2629,7 +2879,7 @@ var Cell = Backgrid$2.Cell = Backbone.View.extend({
   /**
      Put an `error` CSS class on the table cell.
   */
-  renderError: function renderError(model, column) {
+  renderError: function (model, column) {
     if (column == null || column.get("name") == this.column.get("name")) {
       this.$el.addClass("error");
     }
@@ -2638,7 +2888,7 @@ var Cell = Backgrid$2.Cell = Backbone.View.extend({
   /**
      Removes the editor and re-render in display mode.
   */
-  exitEditMode: function exitEditMode() {
+  exitEditMode: function () {
     this.$el.removeClass("error");
     this.currentEditor.remove();
     this.stopListening(this.currentEditor);
@@ -2649,9 +2899,10 @@ var Cell = Backgrid$2.Cell = Backbone.View.extend({
 
   /**
      Clean up this cell.
-      @chainable
+
+     @chainable
   */
-  remove: function remove() {
+  remove: function () {
     if (this.currentEditor) {
       this.currentEditor.remove.apply(this.currentEditor, arguments);
       delete this.currentEditor;
@@ -2686,10 +2937,10 @@ var BooleanCell = Cell.extend({
      Renders a checkbox and check it if the model value of this column is true,
      uncheck otherwise.
   */
-  render: function render() {
+  render: function () {
     this.$el.empty();
     var model = this.model,
-        column = this.column;
+      column = this.column;
     var editable = Backgrid$2.callByNeed(column.editable(), column, model);
     this.$el.append($("<input>", {
       tabIndex: -1,
@@ -2759,12 +3010,14 @@ var SelectCell = Cell.extend({
 
   /**
      Initializer.
-      @param {Object} options
+
+     @param {Object} options
      @param {Backbone.Model} options.model
      @param {Backgrid.Column} options.column
-      @throws {TypeError} If `optionsValues` is undefined.
+
+     @throws {TypeError} If `optionsValues` is undefined.
   */
-  initialize: function initialize(options) {
+  initialize: function (options) {
     SelectCell.__super__.initialize.apply(this, arguments);
     this.listenTo(this.model, "backgrid:edit", function (model, column, cell, editor) {
       if (column.get("name") == this.column.get("name")) {
@@ -2776,9 +3029,10 @@ var SelectCell = Cell.extend({
 
   /**
      Renders the label using the raw value as key to look up from `optionValues`.
-      @throws {TypeError} If `optionValues` is malformed.
+
+     @throws {TypeError} If `optionValues` is malformed.
   */
-  render: function render() {
+  render: function () {
     this.$el.empty();
 
     var optionValues = _.result(this, "optionValues");
@@ -2788,7 +3042,7 @@ var SelectCell = Cell.extend({
     var selectedText = [];
 
     try {
-      if (!_.isArray(optionValues) || _.isEmpty(optionValues)) throw new TypeError();
+      if (!_.isArray(optionValues) || _.isEmpty(optionValues)) throw new TypeError;
 
       for (var k = 0; k < rawData.length; k++) {
         var rawDatum = rawData[k];
@@ -2811,7 +3065,7 @@ var SelectCell = Cell.extend({
               }
             }
           } else {
-            throw new TypeError();
+            throw new TypeError;
           }
         }
       }
@@ -2847,51 +3101,52 @@ var SelectCell = Cell.extend({
 */
 var DatetimeCell = Cell.extend({
 
-   /** @property */
-   className: "datetime-cell",
+  /** @property */
+  className: "datetime-cell",
 
-   /**
-      @property {boolean} [includeDate=true]
-   */
-   includeDate: DatetimeFormatter.prototype.defaults.includeDate,
+  /**
+     @property {boolean} [includeDate=true]
+  */
+  includeDate: DatetimeFormatter.prototype.defaults.includeDate,
 
-   /**
-      @property {boolean} [includeTime=true]
-   */
-   includeTime: DatetimeFormatter.prototype.defaults.includeTime,
+  /**
+     @property {boolean} [includeTime=true]
+  */
+  includeTime: DatetimeFormatter.prototype.defaults.includeTime,
 
-   /**
-      @property {boolean} [includeMilli=false]
-   */
-   includeMilli: DatetimeFormatter.prototype.defaults.includeMilli,
+  /**
+     @property {boolean} [includeMilli=false]
+  */
+  includeMilli: DatetimeFormatter.prototype.defaults.includeMilli,
 
-   /** @property {Backgrid.CellFormatter} [formatter=Backgrid.DatetimeFormatter] */
-   formatter: DatetimeFormatter,
+  /** @property {Backgrid.CellFormatter} [formatter=Backgrid.DatetimeFormatter] */
+  formatter: DatetimeFormatter,
 
-   /**
-      Initializes this cell and the datetime formatter.
-       @param {Object} options
-      @param {Backbone.Model} options.model
-      @param {Backgrid.Column} options.column
-   */
-   initialize: function initialize(options) {
-      DatetimeCell.__super__.initialize.apply(this, arguments);
-      var formatter = this.formatter;
-      formatter.includeDate = this.includeDate;
-      formatter.includeTime = this.includeTime;
-      formatter.includeMilli = this.includeMilli;
+  /**
+     Initializes this cell and the datetime formatter.
 
-      var placeholder = this.includeDate ? "YYYY-MM-DD" : "";
-      placeholder += this.includeDate && this.includeTime ? "T" : "";
-      placeholder += this.includeTime ? "HH:mm:ss" : "";
-      placeholder += this.includeTime && this.includeMilli ? ".SSS" : "";
+     @param {Object} options
+     @param {Backbone.Model} options.model
+     @param {Backgrid.Column} options.column
+  */
+  initialize: function (options) {
+    DatetimeCell.__super__.initialize.apply(this, arguments);
+    var formatter = this.formatter;
+    formatter.includeDate = this.includeDate;
+    formatter.includeTime = this.includeTime;
+    formatter.includeMilli = this.includeMilli;
 
-      this.editor = this.editor.extend({
-         attributes: _.extend({}, this.editor.prototype.attributes, this.editor.attributes, {
-            placeholder: placeholder
-         })
-      });
-   }
+    var placeholder = this.includeDate ? "YYYY-MM-DD" : "";
+    placeholder += (this.includeDate && this.includeTime) ? "T" : "";
+    placeholder += this.includeTime ? "HH:mm:ss" : "";
+    placeholder += (this.includeTime && this.includeMilli) ? ".SSS" : "";
+
+    this.editor = this.editor.extend({
+      attributes: _.extend({}, this.editor.prototype.attributes, this.editor.attributes, {
+        placeholder: placeholder
+      })
+    });
+  }
 
 });
 
@@ -2923,13 +3178,13 @@ var UriCell = Cell.extend({
   */
   target: "_blank",
 
-  initialize: function initialize(options) {
+  initialize: function (options) {
     UriCell.__super__.initialize.apply(this, arguments);
     this.title = options.title || this.title;
     this.target = options.target || this.target;
   },
 
-  render: function render() {
+  render: function () {
     this.$el.empty();
     var rawValue = this.model.get(this.column.get("name"));
     var formattedValue = this.formatter.fromRaw(rawValue, this.model);
@@ -2957,36 +3212,37 @@ var UriCell = Cell.extend({
 */
 var NumberCell = Cell.extend({
 
-   /** @property */
-   className: "number-cell",
+  /** @property */
+  className: "number-cell",
 
-   /**
-      @property {number} [decimals=2] Must be an integer.
-   */
-   decimals: NumberFormatter.prototype.defaults.decimals,
+  /**
+     @property {number} [decimals=2] Must be an integer.
+  */
+  decimals: NumberFormatter.prototype.defaults.decimals,
 
-   /** @property {string} [decimalSeparator='.'] */
-   decimalSeparator: NumberFormatter.prototype.defaults.decimalSeparator,
+  /** @property {string} [decimalSeparator='.'] */
+  decimalSeparator: NumberFormatter.prototype.defaults.decimalSeparator,
 
-   /** @property {string} [orderSeparator=','] */
-   orderSeparator: NumberFormatter.prototype.defaults.orderSeparator,
+  /** @property {string} [orderSeparator=','] */
+  orderSeparator: NumberFormatter.prototype.defaults.orderSeparator,
 
-   /** @property {Backgrid.CellFormatter} [formatter=Backgrid.NumberFormatter] */
-   formatter: NumberFormatter,
+  /** @property {Backgrid.CellFormatter} [formatter=Backgrid.NumberFormatter] */
+  formatter: NumberFormatter,
 
-   /**
-      Initializes this cell and the number formatter.
-       @param {Object} options
-      @param {Backbone.Model} options.model
-      @param {Backgrid.Column} options.column
-   */
-   initialize: function initialize(options) {
-      NumberCell.__super__.initialize.apply(this, arguments);
-      var formatter = this.formatter;
-      formatter.decimals = this.decimals;
-      formatter.decimalSeparator = this.decimalSeparator;
-      formatter.orderSeparator = this.orderSeparator;
-   }
+  /**
+     Initializes this cell and the number formatter.
+
+     @param {Object} options
+     @param {Backbone.Model} options.model
+     @param {Backgrid.Column} options.column
+  */
+  initialize: function (options) {
+    NumberCell.__super__.initialize.apply(this, arguments);
+    var formatter = this.formatter;
+    formatter.decimals = this.decimals;
+    formatter.decimalSeparator = this.decimalSeparator;
+    formatter.orderSeparator = this.orderSeparator;
+  }
 
 });
 
@@ -3020,7 +3276,7 @@ var EmailCell = StringCell.extend({
 
   formatter: EmailFormatter,
 
-  render: function render() {
+  render: function () {
     this.$el.empty();
     var model = this.model;
     var formattedValue = this.formatter.fromRaw(model.get(this.column.get("name")), model);
@@ -3045,13 +3301,13 @@ var EmailCell = StringCell.extend({
 */
 var IntegerCell = NumberCell.extend({
 
-   /** @property */
-   className: "integer-cell",
+  /** @property */
+  className: "integer-cell",
 
-   /**
-      @property {number} decimals Must be an integer.
-   */
-   decimals: 0
+  /**
+     @property {number} decimals Must be an integer.
+  */
+  decimals: 0
 });
 
 /**
@@ -3077,11 +3333,12 @@ var PercentCell = NumberCell.extend({
 
   /**
      Initializes this cell and the percent formatter.
-      @param {Object} options
+
+     @param {Object} options
      @param {Backbone.Model} options.model
      @param {Backgrid.Column} options.column
   */
-  initialize: function initialize() {
+  initialize: function () {
     PercentCell.__super__.initialize.apply(this, arguments);
     var formatter = this.formatter;
     formatter.multiplier = this.multiplier;
@@ -3158,12 +3415,14 @@ var Row = Backbone.View.extend({
 
   /**
      Initializes a row view instance.
-      @param {Object} options
+
+     @param {Object} options
      @param {Backbone.Collection.<Backgrid.Column>|Array.<Backgrid.Column>|Array.<Object>} options.columns Column metadata.
      @param {Backbone.Model} options.model The model instance to render.
-      @throws {TypeError} If options.columns or options.model is undefined.
+
+     @throws {TypeError} If options.columns or options.model is undefined.
   */
-  initialize: function initialize(options) {
+  initialize: function (options) {
 
     var columns = this.columns = options.columns;
     if (!(columns instanceof Backbone.Collection)) {
@@ -3199,13 +3458,16 @@ var Row = Backbone.View.extend({
   /**
      Factory method for making a cell. Used by #initialize internally. Override
      this to provide an appropriate cell instance for a custom Row subclass.
-      @protected
-      @param {Backgrid.Column} column
+
+     @protected
+
+     @param {Backgrid.Column} column
      @param {Object} options The options passed to #initialize.
-      @return {Backgrid.Cell}
+
+     @return {Backgrid.Cell}
   */
-  makeCell: function makeCell(column) {
-    return new (column.get("cell"))({
+  makeCell: function (column) {
+    return new(column.get("cell"))({
       column: column,
       model: this.model
     });
@@ -3214,7 +3476,7 @@ var Row = Backbone.View.extend({
   /**
      Renders a row of cells for this row's model.
   */
-  render: function render() {
+  render: function () {
     this.$el.empty();
 
     var fragment = document.createDocumentFragment();
@@ -3231,9 +3493,10 @@ var Row = Backbone.View.extend({
 
   /**
      Clean up this row and its cells.
-      @chainable
+
+     @chainable
   */
-  remove: function remove() {
+  remove: function () {
     for (var i = 0; i < this.cells.length; i++) {
       var cell = this.cells[i];
       cell.remove.apply(cell, arguments);
@@ -3253,19 +3516,21 @@ var HeaderRow = Row.extend({
 
   /**
      Initializer.
-      @param {Object} options
+
+     @param {Object} options
      @param {Backbone.Collection.<Backgrid.Column>|Array.<Backgrid.Column>|Array.<Object>} options.columns
      @param {Backgrid.HeaderCell} [options.headerCell] Customized default
      HeaderCell for all the columns. Supply a HeaderCell class or instance to a
      the `headerCell` key in a column definition for column-specific header
      rendering.
-      @throws {TypeError} If options.columns or options.collection is undefined.
+
+     @throws {TypeError} If options.columns or options.collection is undefined.
    */
-  initialize: function initialize() {
+  initialize: function () {
     Row.prototype.initialize.apply(this, arguments);
   },
 
-  makeCell: function makeCell(column, options) {
+  makeCell: function (column, options) {
     var headerCell = column.get("headerCell") || options.headerCell || HeaderCell;
     headerCell = new headerCell({
       column: column,
@@ -3291,12 +3556,14 @@ var Header = Backgrid$2.Header = Backbone.View.extend({
   /**
      Initializer. Initializes this table head view to contain a single header
      row view.
-      @param {Object} options
+
+     @param {Object} options
      @param {Backbone.Collection.<Backgrid.Column>|Array.<Backgrid.Column>|Array.<Object>} options.columns Column metadata.
      @param {Backbone.Model} options.model The model instance to render.
-      @throws {TypeError} If options.columns or options.model is undefined.
+
+     @throws {TypeError} If options.columns or options.model is undefined.
    */
-  initialize: function initialize(options) {
+  initialize: function (options) {
     this.columns = options.columns;
     if (!(this.columns instanceof Backbone.Collection)) {
       this.columns = new Columns(this.columns);
@@ -3311,7 +3578,7 @@ var Header = Backgrid$2.Header = Backbone.View.extend({
   /**
      Renders this table head with a single row of header cells.
    */
-  render: function render() {
+  render: function () {
     this.$el.append(this.row.render().$el);
     this.delegateEvents();
     return this;
@@ -3319,9 +3586,10 @@ var Header = Backgrid$2.Header = Backbone.View.extend({
 
   /**
      Clean up this header and its row.
-      @chainable
+
+     @chainable
    */
-  remove: function remove() {
+  remove: function () {
     this.row.remove.apply(this.row, arguments);
     return Backbone.View.prototype.remove.apply(this, arguments);
   }
@@ -3345,11 +3613,12 @@ var EmptyRow = Backbone.View.extend({
 
   /**
      Initializer.
-      @param {Object} options
+
+     @param {Object} options
      @param {string|function(): string} options.emptyText
      @param {Backbone.Collection.<Backgrid.Column>|Array.<Backgrid.Column>|Array.<Object>} options.columns Column metadata.
    */
-  initialize: function initialize(options) {
+  initialize: function (options) {
     this.emptyText = options.emptyText;
     this.columns = options.columns;
   },
@@ -3357,7 +3626,7 @@ var EmptyRow = Backbone.View.extend({
   /**
      Renders an empty row.
   */
-  render: function render() {
+  render: function () {
     this.$el.empty();
 
     var td = document.createElement("td");
@@ -3395,16 +3664,19 @@ var Body = Backgrid$2.Body = Backbone.View.extend({
 
   /**
      Initializer.
-      @param {Object} options
+
+     @param {Object} options
      @param {Backbone.Collection} options.collection
      @param {Backbone.Collection.<Backgrid.Column>|Array.<Backgrid.Column>|Array.<Object>} options.columns
      Column metadata.
      @param {Backgrid.Row} [options.row=Backgrid.Row] The Row class to use.
      @param {string|function(): string} [options.emptyText] The text to display in the empty row.
-      @throws {TypeError} If options.columns or options.collection is undefined.
-      See Backgrid.Row.
+
+     @throws {TypeError} If options.columns or options.collection is undefined.
+
+     See Backgrid.Row.
   */
-  initialize: function initialize(options) {
+  initialize: function (options) {
 
     this.columns = options.columns;
     if (!(this.columns instanceof Backbone.Collection)) {
@@ -3435,7 +3707,7 @@ var Body = Backgrid$2.Body = Backbone.View.extend({
     this.listenTo(this.columns, "add remove", this.updateEmptyRow);
   },
 
-  _unshiftEmptyRowMayBe: function _unshiftEmptyRowMayBe() {
+  _unshiftEmptyRowMayBe: function () {
     if (this.rows.length === 0 && this.emptyText != null) {
       this.emptyRow = new EmptyRow({
         emptyText: this.emptyText,
@@ -3443,35 +3715,40 @@ var Body = Backgrid$2.Body = Backbone.View.extend({
       });
 
       this.rows.unshift(this.emptyRow);
-      return true;
+      return true
     }
   },
 
   /**
      This method can be called either directly or as a callback to a
      [Backbone.Collecton#add](http://backbonejs.org/#Collection-add) event.
-      When called directly, it accepts a model or an array of models and an
+
+     When called directly, it accepts a model or an array of models and an
      option hash just like
      [Backbone.Collection#add](http://backbonejs.org/#Collection-add) and
      delegates to it. Once the model is added, a new row is inserted into the
      body and automatically rendered.
-      When called as a callback of an `add` event, splices a new row into the
+
+     When called as a callback of an `add` event, splices a new row into the
      body and renders it.
-      @param {Backbone.Model} model The model to render as a row.
+
+     @param {Backbone.Model} model The model to render as a row.
      @param {Backbone.Collection} collection When called directly, this
      parameter is actually the options to
      [Backbone.Collection#add](http://backbonejs.org/#Collection-add).
      @param {Object} options When called directly, this must be null.
-      See:
-      - [Backbone.Collection#add](http://backbonejs.org/#Collection-add)
+
+     See:
+
+     - [Backbone.Collection#add](http://backbonejs.org/#Collection-add)
   */
-  insertRow: function insertRow(model, collection, options) {
+  insertRow: function (model, collection, options) {
 
     if (this.rows[0] instanceof EmptyRow) this.rows.pop().remove();
 
     // insertRow() is called directly
     if (!(collection instanceof Backbone.Collection) && !options) {
-      this.collection.add(model, options = collection);
+      this.collection.add(model, (options = collection));
       return;
     }
 
@@ -3500,26 +3777,31 @@ var Body = Backgrid$2.Body = Backbone.View.extend({
      The method can be called either directly or as a callback to a
      [Backbone.Collection#remove](http://backbonejs.org/#Collection-remove)
      event.
-      When called directly, it accepts a model or an array of models and an
+
+     When called directly, it accepts a model or an array of models and an
      option hash just like
      [Backbone.Collection#remove](http://backbonejs.org/#Collection-remove) and
      delegates to it. Once the model is removed, a corresponding row is removed
      from the body.
-      When called as a callback of a `remove` event, splices into the rows and
+
+     When called as a callback of a `remove` event, splices into the rows and
      removes the row responsible for rendering the model.
-      @param {Backbone.Model} model The model to remove from the body.
+
+     @param {Backbone.Model} model The model to remove from the body.
      @param {Backbone.Collection} collection When called directly, this
      parameter is actually the options to
      [Backbone.Collection#remove](http://backbonejs.org/#Collection-remove).
      @param {Object} options When called directly, this must be null.
-      See:
-      - [Backbone.Collection#remove](http://backbonejs.org/#Collection-remove)
+
+     See:
+
+     - [Backbone.Collection#remove](http://backbonejs.org/#Collection-remove)
   */
-  removeRow: function removeRow(model, collection, options) {
+  removeRow: function (model, collection, options) {
 
     // removeRow() is called directly
     if (!options) {
-      this.collection.remove(model, options = collection);
+      this.collection.remove(model, (options = collection));
       if (this._unshiftEmptyRowMayBe()) {
         this.render();
       }
@@ -3543,7 +3825,7 @@ var Body = Backgrid$2.Body = Backbone.View.extend({
      updated colspan, and appends it back into the DOM
   */
 
-  updateEmptyRow: function updateEmptyRow() {
+  updateEmptyRow: function () {
     if (this.emptyRow != null) {
       this.emptyRow.render();
     }
@@ -3554,7 +3836,7 @@ var Body = Backgrid$2.Body = Backbone.View.extend({
      Backbone `backgrid:refresh` event from the collection along with the body
      instance as its sole parameter when done.
   */
-  refresh: function refresh() {
+  refresh: function () {
     for (var i = 0; i < this.rows.length; i++) {
       this.rows[i].remove();
     }
@@ -3581,7 +3863,7 @@ var Body = Backgrid$2.Body = Backbone.View.extend({
      `options.emptyText` is defined and not null in the constructor, an empty
      row is rendered, otherwise no row is rendered.
   */
-  render: function render() {
+  render: function () {
     this.$el.empty();
 
     var fragment = document.createDocumentFragment();
@@ -3599,9 +3881,10 @@ var Body = Backgrid$2.Body = Backbone.View.extend({
 
   /**
      Clean up this body and it's rows.
-      @chainable
+
+     @chainable
   */
-  remove: function remove() {
+  remove: function () {
     for (var i = 0; i < this.rows.length; i++) {
       var row = this.rows[i];
       row.remove.apply(row, arguments);
@@ -3613,19 +3896,23 @@ var Body = Backgrid$2.Body = Backbone.View.extend({
      If the underlying collection is a Backbone.PageableCollection in
      server-mode or infinite-mode, a page of models is fetched after sorting is
      done on the server.
-      If the underlying collection is a Backbone.PageableCollection in
+
+     If the underlying collection is a Backbone.PageableCollection in
      client-mode, or any
      [Backbone.Collection](http://backbonejs.org/#Collection) instance, sorting
      is done on the client side. If the collection is an instance of a
      Backbone.PageableCollection, sorting will be done globally on all the pages
      and the current page will then be returned.
-      Triggers a Backbone `backgrid:sorted` event from the collection when done
+
+     Triggers a Backbone `backgrid:sorted` event from the collection when done
      with the column, direction and a reference to the collection.
-      @param {Backgrid.Column|string} column
+
+     @param {Backgrid.Column|string} column
      @param {null|"ascending"|"descending"} direction
-      See [Backbone.Collection#comparator](http://backbonejs.org/#Collection-comparator)
+
+     See [Backbone.Collection#comparator](http://backbonejs.org/#Collection-comparator)
   */
-  sort: function sort(column, direction) {
+  sort: function (column, direction) {
 
     if (!_.contains(["ascending", "descending", null], direction)) {
       throw new RangeError('direction must be one of "ascending", "descending" or `null`');
@@ -3638,13 +3925,19 @@ var Body = Backgrid$2.Body = Backbone.View.extend({
     var collection = this.collection;
 
     var order;
-    if (direction === "ascending") order = -1;else if (direction === "descending") order = 1;else order = null;
+    if (direction === "ascending") order = -1;
+    else if (direction === "descending") order = 1;
+    else order = null;
 
-    var comparator = this.makeComparator(column.get("name"), order, order ? column.sortValue() : function (model) {
-      return model.cid.replace('c', '') * 1;
-    });
+    var comparator = this.makeComparator(column.get("name"), order,
+      order ?
+      column.sortValue() :
+      function (model) {
+        return model.cid.replace('c', '') * 1;
+      });
 
-    if (Backbone.PageableCollection && collection instanceof Backbone.PageableCollection) {
+    if (Backbone.PageableCollection &&
+      collection instanceof Backbone.PageableCollection) {
 
       collection.setSorting(order && column.get("name"), order, {
         sortValue: column.sortValue()
@@ -3662,7 +3955,7 @@ var Body = Backgrid$2.Body = Backbone.View.extend({
         column.set("direction", direction);
       } else collection.fetch({
         reset: true,
-        success: function success() {
+        success: function () {
           collection.trigger("backgrid:sorted", column, direction, collection);
           column.set("direction", direction);
         }
@@ -3677,19 +3970,20 @@ var Body = Backgrid$2.Body = Backbone.View.extend({
     return this;
   },
 
-  makeComparator: function makeComparator(attr, order, func) {
+  makeComparator: function (attr, order, func) {
 
     return function (left, right) {
       // extract the values from the models
       var l = func(left, attr),
-          r = func(right, attr),
-          t;
+        r = func(right, attr),
+        t;
 
       // if descending order, swap left and right
       if (order === 1) t = l, l = r, r = t;
 
       // compare as usual
-      if (l === r) return 0;else if (l < r) return -1;
+      if (l === r) return 0;
+      else if (l < r) return -1;
       return 1;
     };
   },
@@ -3697,16 +3991,18 @@ var Body = Backgrid$2.Body = Backbone.View.extend({
   /**
      Moves focus to the next renderable and editable cell and return the
      currently editing cell to display mode.
-      Triggers a `backgrid:next` event on the model with the indices of the row
+
+     Triggers a `backgrid:next` event on the model with the indices of the row
      and column the user *intended* to move to, and whether the intended move
      was going to go out of bounds. Note that *out of bound* always means an
      attempt to go past the end of the last row.
-      @param {Backbone.Model} model The originating model
+
+     @param {Backbone.Model} model The originating model
      @param {Backgrid.Column} column The originating model column
      @param {Backgrid.Command} command The Command object constructed from a DOM
      event
   */
-  moveToNextCell: function moveToNextCell(model, column, command) {
+  moveToNextCell: function (model, column, command) {
     var i = this.collection.indexOf(model);
     var j = this.columns.indexOf(column);
     var cell, renderable, editable, m, n;
@@ -3716,7 +4012,8 @@ var Body = Backgrid$2.Body = Backbone.View.extend({
 
     this.rows[i].cells[j].exitEditMode();
 
-    if (command.moveUp() || command.moveDown() || command.moveLeft() || command.moveRight() || command.save()) {
+    if (command.moveUp() || command.moveDown() || command.moveLeft() ||
+      command.moveRight() || command.save()) {
       var l = this.columns.length;
       var maxOffset = l * this.collection.length;
 
@@ -3778,13 +4075,15 @@ var Footer = Backbone.View.extend({
 
   /**
      Initializer.
-      @param {Object} options
+
+     @param {Object} options
      @param {Backbone.Collection.<Backgrid.Column>|Array.<Backgrid.Column>|Array.<Object>} options.columns
      Column metadata.
      @param {Backbone.Collection} options.collection
-      @throws {TypeError} If options.columns or options.collection is undefined.
+
+     @throws {TypeError} If options.columns or options.collection is undefined.
   */
-  initialize: function initialize(options) {
+  initialize: function (options) {
     this.columns = options.columns;
     if (!(this.columns instanceof Backbone.Collection)) {
       this.columns = new Columns(this.columns);
@@ -3867,7 +4166,8 @@ var Grid = Backbone.View.extend({
 
   /**
      Initializes a Grid instance.
-      @param {Object} options
+
+     @param {Object} options
      @param {Backbone.Collection.<Backgrid.Columns>|Array.<Backgrid.Column>|Array.<Object>} options.columns Column metadata.
      @param {Backbone.Collection} options.collection The collection of tabular model data to display.
      @param {string} [options.caption=string] An optional caption to be added to the table.
@@ -3876,7 +4176,7 @@ var Grid = Backbone.View.extend({
      @param {Backgrid.Row} [options.row=Backgrid.Row] An optional Row class to override the default.
      @param {Backgrid.Footer} [options.footer=Backgrid.Footer] An optional Footer class.
    */
-  initialize: function initialize(options) {
+  initialize: function (options) {
     // Convert the list of column objects here first so the subviews don't have
     // to.
     if (!(options.columns instanceof Backbone.Collection)) {
@@ -3886,7 +4186,9 @@ var Grid = Backbone.View.extend({
 
     this.caption = options.caption;
 
-    var filteredOptions = _.omit(options, ["el", "id", "attributes", "className", "tagName", "events"]);
+    var filteredOptions = _.omit(options, ["el", "id", "attributes",
+      "className", "tagName", "events"
+    ]);
 
     // must construct body first so it listens to backgrid:sort first
     this.body = options.body || this.body;
@@ -3904,11 +4206,11 @@ var Grid = Backbone.View.extend({
 
     this.listenTo(this.columns, "reset", function () {
       if (this.header) {
-        this.header = new (this.header.remove().constructor)(filteredOptions);
+        this.header = new(this.header.remove().constructor)(filteredOptions);
       }
-      this.body = new (this.body.remove().constructor)(filteredOptions);
+      this.body = new(this.body.remove().constructor)(filteredOptions);
       if (this.footer) {
-        this.footer = new (this.footer.remove().constructor)(filteredOptions);
+        this.footer = new(this.footer.remove().constructor)(filteredOptions);
       }
       this.render();
     });
@@ -3917,7 +4219,7 @@ var Grid = Backbone.View.extend({
   /**
      Delegates to Backgrid.Body#insertRow.
    */
-  insertRow: function insertRow() {
+  insertRow: function () {
     this.body.insertRow.apply(this.body, arguments);
     return this;
   },
@@ -3925,7 +4227,7 @@ var Grid = Backbone.View.extend({
   /**
      Delegates to Backgrid.Body#removeRow.
    */
-  removeRow: function removeRow() {
+  removeRow: function () {
     this.body.removeRow.apply(this.body, arguments);
     return this;
   },
@@ -3934,9 +4236,10 @@ var Grid = Backbone.View.extend({
      Delegates to Backgrid.Columns#add for adding a column. Subviews can listen
      to the `add` event from their internal `columns` if rerendering needs to
      happen.
-      @param {Object} [options] Options for `Backgrid.Columns#add`.
+
+     @param {Object} [options] Options for `Backgrid.Columns#add`.
    */
-  insertColumn: function insertColumn() {
+  insertColumn: function () {
     this.columns.add.apply(this.columns, arguments);
     return this;
   },
@@ -3945,9 +4248,10 @@ var Grid = Backbone.View.extend({
      Delegates to Backgrid.Columns#remove for removing a column. Subviews can
      listen to the `remove` event from the internal `columns` if rerendering
      needs to happen.
-      @param {Object} [options] Options for `Backgrid.Columns#remove`.
+
+     @param {Object} [options] Options for `Backgrid.Columns#remove`.
    */
-  removeColumn: function removeColumn() {
+  removeColumn: function () {
     this.columns.remove.apply(this.columns, arguments);
     return this;
   },
@@ -3955,7 +4259,7 @@ var Grid = Backbone.View.extend({
   /**
      Delegates to Backgrid.Body#sort.
    */
-  sort: function sort() {
+  sort: function () {
     this.body.sort.apply(this.body, arguments);
     return this;
   },
@@ -3965,7 +4269,7 @@ var Grid = Backbone.View.extend({
      Backbone `backgrid:rendered` event along with a reference to the grid when
      the it has successfully been rendered.
    */
-  render: function render() {
+  render: function () {
     this.$el.empty();
 
     if (this.caption) {
@@ -3991,9 +4295,10 @@ var Grid = Backbone.View.extend({
 
   /**
      Clean up this grid and its subviews.
-      @chainable
+
+     @chainable
    */
-  remove: function remove() {
+  remove: function () {
     this.header && this.header.remove.apply(this.header, arguments);
     this.body.remove.apply(this.body, arguments);
     this.footer && this.footer.remove.apply(this.footer, arguments);
@@ -4009,6 +4314,8 @@ var Grid = Backbone.View.extend({
   Copyright (c) 2016 Jimmy Yuen Ho Wong and contributors <wyuenho@gmail.com>
   Licensed under the MIT license.
 */
+
+"use strict";
 
 Backgrid$2.Command = Command;
 
@@ -4058,6 +4365,8 @@ Backgrid$2.Grid = Grid;
   Copyright (c) 2013-present Cloudflare, Inc and contributors
   Licensed under the MIT @license.
 */
+
+"use strict";
 
 /**
    PageHandle is a class that renders the actual page handles and reacts to
@@ -4116,7 +4425,7 @@ var PageHandle = Backgrid$2.Extension.PageHandle = Backbone.View.extend({
      parameter, which contains a mandatory `label` key which provides the
      label value to be displayed.
   */
-  title: function title(data) {
+  title: function (data) {
     return 'Page ' + data.label;
   },
 
@@ -4146,7 +4455,8 @@ var PageHandle = Backgrid$2.Extension.PageHandle = Backbone.View.extend({
 
   /**
      Initializer.
-      @param {Object} options
+
+     @param {Object} options
      @param {Backbone.Collection} options.collection
      @param {number} pageIndex 0-based index of the page number this handle
      handles. This parameter will be normalized to the base the underlying
@@ -4160,7 +4470,7 @@ var PageHandle = Backgrid$2.Extension.PageHandle = Backbone.View.extend({
      @param {boolean} [options.isForward=false]
      @param {boolean} [options.isFastForward=false]
   */
-  initialize: function initialize(options) {
+  initialize: function (options) {
     var collection = this.collection;
     var state = collection.state;
     var currentPage = state.currentPage;
@@ -4170,9 +4480,13 @@ var PageHandle = Backgrid$2.Extension.PageHandle = Backbone.View.extend({
     _.extend(this, _.pick(options, ["isRewind", "isBack", "isForward", "isFastForward"]));
 
     var pageIndex;
-    if (this.isRewind) pageIndex = firstPage;else if (this.isBack) pageIndex = Math.max(firstPage, currentPage - 1);else if (this.isForward) pageIndex = Math.min(lastPage, currentPage + 1);else if (this.isFastForward) pageIndex = lastPage;else {
+    if (this.isRewind) pageIndex = firstPage;
+    else if (this.isBack) pageIndex = Math.max(firstPage, currentPage - 1);
+    else if (this.isForward) pageIndex = Math.min(lastPage, currentPage + 1);
+    else if (this.isFastForward) pageIndex = lastPage;
+    else {
       pageIndex = +options.pageIndex;
-      pageIndex = firstPage ? pageIndex + 1 : pageIndex;
+      pageIndex = (firstPage ? pageIndex + 1 : pageIndex);
     }
     this.pageIndex = pageIndex;
 
@@ -4186,7 +4500,7 @@ var PageHandle = Backgrid$2.Extension.PageHandle = Backbone.View.extend({
   /**
      Renders a clickable anchor element under a list item.
   */
-  render: function render() {
+  render: function () {
     this.$el.empty();
     var anchor = document.createElement("a");
     anchor.href = '#';
@@ -4199,9 +4513,16 @@ var PageHandle = Backgrid$2.Extension.PageHandle = Backbone.View.extend({
     var currentPage = state.currentPage;
     var pageIndex = this.pageIndex;
 
-    if (this.isRewind && currentPage == state.firstPage || this.isBack && !collection.hasPreviousPage() || this.isForward && !collection.hasNextPage() || this.isFastForward && (currentPage == state.lastPage || state.totalPages < 1)) {
+    if (this.isRewind && currentPage == state.firstPage ||
+      this.isBack && !collection.hasPreviousPage() ||
+      this.isForward && !collection.hasNextPage() ||
+      this.isFastForward && (currentPage == state.lastPage || state.totalPages < 1)) {
       this.$el.addClass("disabled");
-    } else if (!(this.isRewind || this.isBack || this.isForward || this.isFastForward) && state.currentPage == pageIndex) {
+    } else if (!(this.isRewind ||
+        this.isBack ||
+        this.isForward ||
+        this.isFastForward) &&
+      state.currentPage == pageIndex) {
       this.$el.addClass("active");
     }
 
@@ -4213,20 +4534,24 @@ var PageHandle = Backgrid$2.Extension.PageHandle = Backbone.View.extend({
      jQuery click event handler. Goes to the page this PageHandle instance
      represents. No-op if this page handle is currently active or disabled.
   */
-  changePage: function changePage(e) {
+  changePage: function (e) {
     e.preventDefault();
     var $el = this.$el,
-        col = this.collection;
+      col = this.collection;
     if (!$el.hasClass("active") && !$el.hasClass("disabled")) {
       if (this.isRewind) col.getFirstPage({
         reset: true
-      });else if (this.isBack) col.getPreviousPage({
+      });
+      else if (this.isBack) col.getPreviousPage({
         reset: true
-      });else if (this.isForward) col.getNextPage({
+      });
+      else if (this.isForward) col.getNextPage({
         reset: true
-      });else if (this.isFastForward) col.getLastPage({
+      });
+      else if (this.isFastForward) col.getLastPage({
         reset: true
-      });else col.getPage(this.pageIndex, {
+      });
+      else col.getPage(this.pageIndex, {
         reset: true
       });
     }
@@ -4259,8 +4584,10 @@ var Paginator = Backgrid$2.Extension.Paginator = Backbone.View.extend({
      default windowSize(10) * slideScale(0.5) yields 5, which means the window
      will slide forward 5 pages as soon as you've reached page 6. The smaller
      the scale factor the less pages to slide, and vice versa.
-      Also See:
-      - #slideMaybe
+
+     Also See:
+
+     - #slideMaybe
      - #slideHowMuch
   */
   slideScale: 0.5,
@@ -4311,18 +4638,23 @@ var Paginator = Backgrid$2.Extension.Paginator = Backbone.View.extend({
 
   /**
      Initializer.
-      @param {Object} options
+
+     @param {Object} options
      @param {Backbone.Collection} options.collection
      @param {boolean} [options.controls]
      @param {boolean} [options.pageHandle=Backgrid.Extension.PageHandle]
      @param {boolean} [options.goBackFirstOnSort=true]
      @param {boolean} [options.renderMultiplePagesOnly=false]
   */
-  initialize: function initialize(options) {
+  initialize: function (options) {
     var self = this;
-    self.controls = _.defaults(options.controls || {}, self.controls, Paginator.prototype.controls);
+    self.controls = _.defaults(options.controls || {}, self.controls,
+      Paginator.prototype.controls);
 
-    _.extend(self, _.pick(options || {}, "windowSize", "pageHandle", "slideScale", "goBackFirstOnSort", "renderIndexedPageHandles", "renderMultiplePagesOnly"));
+    _.extend(self, _.pick(options || {}, "windowSize", "pageHandle",
+      "slideScale", "goBackFirstOnSort",
+      "renderIndexedPageHandles",
+      "renderMultiplePagesOnly"));
 
     var col = self.collection;
     self.listenTo(col, "add", self.render);
@@ -4339,15 +4671,18 @@ var Paginator = Backgrid$2.Extension.Paginator = Backbone.View.extend({
     Decides whether the window should slide. This method should return 1 if
     sliding should occur and 0 otherwise. The default is sliding should occur
     if half of the pages in a window has been reached.
-     __Note__: All the parameters have been normalized to be 0-based.
-     @param {number} firstPage
+
+    __Note__: All the parameters have been normalized to be 0-based.
+
+    @param {number} firstPage
     @param {number} lastPage
     @param {number} currentPage
     @param {number} windowSize
     @param {number} slideScale
-     @return {0|1}
+
+    @return {0|1}
    */
-  slideMaybe: function slideMaybe(firstPage, lastPage, currentPage, windowSize, slideScale) {
+  slideMaybe: function (firstPage, lastPage, currentPage, windowSize, slideScale) {
     return Math.round(currentPage % windowSize / windowSize);
   },
 
@@ -4355,19 +4690,22 @@ var Paginator = Backgrid$2.Extension.Paginator = Backbone.View.extend({
     Decides how many pages to slide when sliding should occur. The default
     simply scales the `windowSize` to arrive at a fraction of the `windowSize`
     to increment.
-     __Note__: All the parameters have been normalized to be 0-based.
-     @param {number} firstPage
+
+    __Note__: All the parameters have been normalized to be 0-based.
+
+    @param {number} firstPage
     @param {number} lastPage
     @param {number} currentPage
     @param {number} windowSize
     @param {number} slideScale
-     @return {number}
+
+    @return {number}
    */
-  slideThisMuch: function slideThisMuch(firstPage, lastPage, currentPage, windowSize, slideScale) {
+  slideThisMuch: function (firstPage, lastPage, currentPage, windowSize, slideScale) {
     return ~~(windowSize * slideScale);
   },
 
-  _calculateWindow: function _calculateWindow() {
+  _calculateWindow: function () {
     var collection = this.collection;
     var state = collection.state;
 
@@ -4381,7 +4719,8 @@ var Paginator = Backgrid$2.Extension.Paginator = Backbone.View.extend({
     var slideScale = this.slideScale;
     var windowStart = Math.floor(currentPage / windowSize) * windowSize;
     if (currentPage <= lastPage - this.slideThisMuch()) {
-      windowStart += this.slideMaybe(firstPage, lastPage, currentPage, windowSize, slideScale) * this.slideThisMuch(firstPage, lastPage, currentPage, windowSize, slideScale);
+      windowStart += (this.slideMaybe(firstPage, lastPage, currentPage, windowSize, slideScale) *
+        this.slideThisMuch(firstPage, lastPage, currentPage, windowSize, slideScale));
     }
     var windowEnd = Math.min(lastPage + 1, windowStart + windowSize);
     return [windowStart, windowEnd];
@@ -4389,16 +4728,17 @@ var Paginator = Backgrid$2.Extension.Paginator = Backbone.View.extend({
 
   /**
      Creates a list of page handle objects for rendering.
-      @return {Array.<Object>} an array of page handle objects hashes
+
+     @return {Array.<Object>} an array of page handle objects hashes
   */
-  makeHandles: function makeHandles() {
+  makeHandles: function () {
 
     var handles = [];
     var collection = this.collection;
 
     var window = this._calculateWindow();
     var winStart = window[0],
-        winEnd = window[1];
+      winEnd = window[1];
 
     if (this.renderIndexedPageHandles) {
       for (var i = winStart; i < winEnd; i++) {
@@ -4420,7 +4760,8 @@ var Paginator = Backgrid$2.Extension.Paginator = Backbone.View.extend({
         };
         handleCtorOpts["is" + key.slice(0, 1).toUpperCase() + key.slice(1)] = true;
         var handle = new this.pageHandle(handleCtorOpts);
-        if (key == "rewind" || key == "back") handles.unshift(handle);else handles.push(handle);
+        if (key == "rewind" || key == "back") handles.unshift(handle);
+        else handles.push(handle);
       }
     }, this);
 
@@ -4430,7 +4771,7 @@ var Paginator = Backgrid$2.Extension.Paginator = Backbone.View.extend({
   /**
      Render the paginator handles inside an unordered list.
   */
-  render: function render() {
+  render: function () {
     this.$el.empty();
 
     var totalPages = this.collection.state.totalPages;
@@ -4467,6 +4808,8 @@ var Paginator = Backgrid$2.Extension.Paginator = Backbone.View.extend({
  Copyright (c) 2014 Wilbert van de Ridder
  Licensed under the MIT @license.
  */
+"use strict";
+
 // Adds width support to columns
 Backgrid$2.Extension.SizeAbleColumns = Backbone.View.extend({
   /** @property */
@@ -4476,7 +4819,7 @@ Backgrid$2.Extension.SizeAbleColumns = Backbone.View.extend({
    * Initializer
    * @param options
    */
-  initialize: function initialize(options) {
+  initialize: function (options) {
     this.grid = options.grid;
 
     // Attach event listeners once on render
@@ -4491,7 +4834,7 @@ Backgrid$2.Extension.SizeAbleColumns = Backbone.View.extend({
    * Adds sizeable columns using <col> elements in a <colgroup>
    * @returns {Backgrid.Extension.SizeAbleColumns}
    */
-  render: function render() {
+  render: function () {
     var view = this;
     view.$el.empty();
 
@@ -4537,7 +4880,7 @@ Backgrid$2.Extension.SizeAbleColumns = Backbone.View.extend({
    * @returns {*|JQuery|any|jQuery}
    * @private
    */
-  getColumnElement: function getColumnElement(colModel) {
+  getColumnElement: function (colModel) {
     return this.$el.find('col[data-column-cid="' + colModel.cid + '"]');
   },
 
@@ -4547,7 +4890,7 @@ Backgrid$2.Extension.SizeAbleColumns = Backbone.View.extend({
    * @returns {Integer}
    * @private
    */
-  getHeaderElementWidth: function getHeaderElementWidth(colModel) {
+  getHeaderElementWidth: function (colModel) {
     return this.grid.header.$el.find("th[data-column-cid='" + colModel.cid + "']").outerWidth();
   },
 
@@ -4556,7 +4899,7 @@ Backgrid$2.Extension.SizeAbleColumns = Backbone.View.extend({
    * @param colModel Backgrid.Column
    * @private
    */
-  setWidthAuto: function setWidthAuto(colModel) {
+  setWidthAuto: function (colModel) {
     // Get column element
     var $colElement = this.getColumnElement(colModel);
 
@@ -4574,7 +4917,7 @@ Backgrid$2.Extension.SizeAbleColumns = Backbone.View.extend({
    * @param colModel Backgrid.Column
    * @private
    */
-  setWidthFixed: function setWidthFixed(colModel) {
+  setWidthFixed: function (colModel) {
     // Get column element
     var $colElement = this.getColumnElement(colModel);
 
@@ -4594,7 +4937,7 @@ Backgrid$2.Extension.SizeAbleColumns = Backbone.View.extend({
    * Updates the view's <col> elements to current width
    * @private
    */
-  setColToActualWidth: function setColToActualWidth() {
+  setColToActualWidth: function () {
     var view = this;
     var changed = false;
     _.each(view.grid.header.row.cells, function (cell) {
@@ -4618,7 +4961,7 @@ Backgrid$2.Extension.SizeAbleColumnsHandlers = Backbone.View.extend({
    * Initializer
    * @param options
    */
-  initialize: function initialize(options) {
+  initialize: function (options) {
     this.sizeAbleColumns = options.sizeAbleColumns;
     this.grid = this.sizeAbleColumns.grid;
     this.columns = this.grid.columns;
@@ -4633,7 +4976,7 @@ Backgrid$2.Extension.SizeAbleColumnsHandlers = Backbone.View.extend({
    * Adds handlers to resize the columns
    * @returns {Backgrid.Extension.SizeAbleColumnsHandlers}
    */
-  render: function render() {
+  render: function () {
     var view = this;
     view.$el.empty();
 
@@ -4649,8 +4992,14 @@ Backgrid$2.Extension.SizeAbleColumnsHandlers = Backbone.View.extend({
 
       if (columnModel && columnModel.get("resizeable")) {
         // Create helper elements
-        var $resizeHandler = $("<div></div>").addClass("resizeHandler").attr("data-column-index", index).appendTo(view.$el);
-        var $resizeHandlerHelper = $("<div></div>").hide().addClass("grid-draggable-cursor").appendTo($resizeHandler);
+        var $resizeHandler = $("<div></div>")
+          .addClass("resizeHandler")
+          .attr("data-column-index", index)
+          .appendTo(view.$el);
+        var $resizeHandlerHelper = $("<div></div>")
+          .hide()
+          .addClass("grid-draggable-cursor")
+          .appendTo($resizeHandler);
 
         // Make draggable
         $resizeHandler.on("mousedown", function (e) {
@@ -4664,7 +5013,7 @@ Backgrid$2.Extension.SizeAbleColumnsHandlers = Backbone.View.extend({
           $resizeHandlerHelper.show();
 
           // Follow the mouse
-          var mouseMoveHandler = function mouseMoveHandler(evt) {
+          var mouseMoveHandler = function (evt) {
             view._stopEvent(evt);
 
             // Check for constraints
@@ -4692,7 +5041,7 @@ Backgrid$2.Extension.SizeAbleColumnsHandlers = Backbone.View.extend({
           $doc.on("mousemove", mouseMoveHandler);
 
           // Add handler to listen for mouseup
-          var mouseUpHandler = function mouseUpHandler(evt) {
+          var mouseUpHandler = function (evt) {
             // Cleanup
             view._stopEvent(evt);
             $resizeHandler.removeClass("grid-draggable");
@@ -4702,7 +5051,7 @@ Backgrid$2.Extension.SizeAbleColumnsHandlers = Backbone.View.extend({
 
             // Adjust column size
             var stopX = Math.round($resizeHandler.offset().left);
-            var offset = startX - stopX;
+            var offset = (startX - stopX);
             var oldWidth = $column.outerWidth();
             var newWidth = oldWidth - offset;
             $col.width(newWidth);
@@ -4748,7 +5097,7 @@ Backgrid$2.Extension.SizeAbleColumnsHandlers = Backbone.View.extend({
    * @param e {Event}
    * @private
    */
-  _stopEvent: function _stopEvent(e) {
+  _stopEvent: function (e) {
     if (e.stopPropagation) {
       e.stopPropagation();
     }
@@ -4763,7 +5112,7 @@ Backgrid$2.Extension.SizeAbleColumnsHandlers = Backbone.View.extend({
    * Add listeners
    * @private
    */
-  attachEvents: function attachEvents() {
+  attachEvents: function () {
     var view = this;
     view.listenTo(view.columns, "change:resizeable", view.render);
     view.listenTo(view.columns, "resize width:auto width:fixed add remove", view.checkSpacerColumn);
@@ -4785,7 +5134,7 @@ Backgrid$2.Extension.SizeAbleColumnsHandlers = Backbone.View.extend({
    * that the grid element width.
    * @private
    */
-  checkSpacerColumn: function checkSpacerColumn() {
+  checkSpacerColumn: function () {
     var view = this;
     var spacerColumn = _.first(view.columns.where({
       name: "__spacerColumn"
@@ -4797,7 +5146,7 @@ Backgrid$2.Extension.SizeAbleColumnsHandlers = Backbone.View.extend({
     // Check if there is a column with auto width, if so, no need to do anything
     if (_.isEmpty(autoColumns)) {
       var totalWidth = view.columns.reduce(function (memo, num) {
-        var colWidth = num.get("width") == "*" ? 0 : num.get("width");
+        var colWidth = (num.get("width") == "*") ? 0 : num.get("width");
         return memo + colWidth;
       }, 0);
       var gridWidth = view.grid.$el.width();
@@ -4824,7 +5173,7 @@ Backgrid$2.Extension.SizeAbleColumnsHandlers = Backbone.View.extend({
    * @returns Object
    * @private
    */
-  getSpacerColumn: function getSpacerColumn() {
+  getSpacerColumn: function () {
     return Backgrid$2.Extension.SizeAbleColumns.spacerColumnDefinition;
   },
 
@@ -4832,20 +5181,21 @@ Backgrid$2.Extension.SizeAbleColumnsHandlers = Backbone.View.extend({
    * Updates the position of the handlers
    * @private
    */
-  updateHandlerPosition: function updateHandlerPosition() {
+  updateHandlerPosition: function () {
     var view = this;
     _.each(view.headerElements, function (columnEl, index) {
       var $column = $(columnEl);
 
       // Get handler for current column and update position
-      view.$el.children().filter("[data-column-index='" + index + "']").css("left", $column.position().left + $column.outerWidth());
+      view.$el.children().filter("[data-column-index='" + index + "']")
+        .css("left", $column.position().left + $column.outerWidth());
     });
   },
 
   /**
    * Find the current header elements and stores them
    */
-  setHeaderElements: function setHeaderElements() {
+  setHeaderElements: function () {
     var self = this;
     var rows = self.grid.header.headerRows || [self.grid.header.row];
     self.headerCells = [];
@@ -4874,7 +5224,8 @@ Backgrid$2.Extension.SizeAbleColumnsHandlers = Backbone.View.extend({
 
     // Filter cells
     self.headerCells = _.filter(headerCells, function (cell) {
-      return cell.column.get("renderable") === true || typeof cell.column.get("renderable") === "undefined";
+      return cell.column.get("renderable") === true ||
+        typeof cell.column.get("renderable") === "undefined"
     });
 
     self.headerElements = _.map(self.headerCells, function (cell) {
@@ -4888,15 +5239,15 @@ Backgrid$2.Extension.SizeAbleColumnsHandlers = Backbone.View.extend({
    * @param {DOM Element}
    * @return {Backbone Events style object}
    **/
-  _asEvents: function _asEvents(el) {
+  _asEvents: function (el) {
     var args;
     return {
-      on: function on(event, handler) {
+      on: function (event, handler) {
         if (args) throw new Error("this is one off wrapper");
         el.addEventListener(event, handler, false);
         args = [event, handler];
       },
-      off: function off() {
+      off: function () {
         el.removeEventListener.apply(el, args);
       }
     };
@@ -4919,9 +5270,5 @@ Backgrid$2.Extension.SizeAbleColumns.spacerColumnDefinition = {
   displayOrder: 9999
 };
 
-exports.Backgrid = Backgrid$2;
-exports['default'] = Backgrid$2;
-
-Object.defineProperty(exports, '__esModule', { value: true });
-
-})));
+export { Backgrid$2 as Backgrid };
+export default Backgrid$2;
