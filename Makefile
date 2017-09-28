@@ -17,7 +17,7 @@ install:
 
 
 test:
-	grunt karma
+	$$(npm bin)/grunt karma
 
 backbone: 	ig_backbone 	ig_backbone_bundle
 
