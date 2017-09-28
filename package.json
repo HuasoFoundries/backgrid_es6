@@ -6,12 +6,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/InstaGIS/ig_backgrid"
+    "url": "https://github.com/InstaGIS/backgrid_es6"
   },
   "bugs": {
-    "url": "https://github.com/InstaGIS/ig_backgrid/issues"
+    "url": "https://github.com/InstaGIS/backgrid_es6/issues"
   },
-  "homepage": "https://github.com/InstaGIS/ig_backgrid",
+  "homepage": "https://github.com/InstaGIS/backgrid_es6",
   "engines": {
     "node": "6.0.x"
   },
