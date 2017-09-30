@@ -36,7 +36,7 @@
   "devDependencies": {
     "babel-eslint": "^7",
     "eslint": "^3",
-    "jasmine-core": "^2.5s",
+    "jasmine-core": "^2.8.0",
     "karma": "^1.1",
     "karma-jasmine": "^1.1",
     "karma-mocha-reporter": "^2.2",
