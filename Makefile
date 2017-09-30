@@ -3,31 +3,23 @@ VERSION = $(shell cat package.json | sed -n 's/.*"version": "\([^"]*\)",/\1/p')
 SHELL = /usr/bin/env bash
 
 default: build
-.PHONY: ig_backgrid test build ig_backgrid_bundle  backgrid 
+.PHONY: ig_backgrid test build ig_backgrid_bundle  backgrid remove_tag
 
  
-build: backgrid
+build: 
+	$$(npm bin)/rollup -c
+	sed -i s/".BackgridES6"/""/g dist/backgrid.js
 
 version:
 	@echo $(VERSION)
 
 install: 
 	npm install
-	$$(npm bin)/jspm install
 
 
 test:
 	$$(npm bin)/karma start
 
-
-backgrid: 	ig_backgrid 	ig_backgrid_bundle
-
-
-ig_backgrid:
-	$$(npm bin)/jspm build src dist/ig_backgrid.js --format esm --skip-source-maps --skip-encode-names 
-
-ig_backgrid_bundle:	
-	$$(npm bin)/jspm build src dist/ig_backgrid.bundle.js  --format umd --skip-encode-names --global-name window --skip-source-maps
 
 
 update_version:
@@ -71,3 +63,13 @@ tag_and_push:
 tag: build release
 
 release: test check_version update_version tag_and_push	
+
+
+		
+remove_tag:
+ifeq ($(t),)
+	$(error t is undefined, you must config a tag name. e.g. make remove_tag t=v1.0.0)
+endif
+	@echo "Removing tag " $(t) locally and remotely
+	git tag -d $(t)
+	git push origin :refs/tags/$(t)

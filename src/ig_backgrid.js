@@ -4,7 +4,7 @@ import {
 
 import {
   Backgrid
-} from 'backgrid';
+} from './backgrid.es6.js';
 
 import {
   PageHandle,
