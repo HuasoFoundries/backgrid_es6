@@ -3,7 +3,7 @@ VERSION = $(shell cat package.json | sed -n 's/.*"version": "\([^"]*\)",/\1/p')
 SHELL = /usr/bin/env bash
 
 default: build
-.PHONY: ig_backgrid test build ig_backgrid_bundle  backgrid 
+.PHONY: ig_backgrid test build ig_backgrid_bundle  backgrid remove_tag
 
  
 build: 
@@ -63,3 +63,13 @@ tag_and_push:
 tag: build release
 
 release: test check_version update_version tag_and_push	
+
+
+		
+remove_tag:
+ifeq ($(t),)
+	$(error t is undefined, you must config a tag name. e.g. make remove_tag t=v1.0.0)
+endif
+	@echo "Removing tag " $(t) locally and remotely
+	git tag -d $(t)
+	git push origin :refs/tags/$(t)

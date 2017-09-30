@@ -1,6 +1,6 @@
 # Backgrid ES6
 
-[![Travis CI](https://travis-ci.org/InstaGIS/backgrid_es6.svg?branch=master)](https://travis-ci.org/InstaGIS/backgrid_es6)
+[![npm](https://img.shields.io/npm/dm/systemjs-less-plugin.svg?style=plastic)](https://www.npmjs.com/package/backgrid_es6) [![Travis CI](https://travis-ci.org/InstaGIS/backgrid_es6.svg?branch=master)](https://travis-ci.org/InstaGIS/backgrid_es6) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/HuasoFoundries/backgrid_es6/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/HuasoFoundries/backgrid_es6/?branch=master) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/1a1c1239d1ee4f65b53513bde3986507)](https://www.codacy.com/app/amenadiel/backgrid_es6?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=HuasoFoundries/backgrid_es6&amp;utm_campaign=Badge_Grade)
 
 This repo contains an ES6 version of [Backgrid.js](https://github.com/cloudflare/backgrid), allowing for ES6 imports and **tree shaking**.
 
