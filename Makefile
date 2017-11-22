@@ -1,6 +1,13 @@
 VERSION = $(shell cat package.json | sed -n 's/.*"version": "\([^"]*\)",/\1/p')
+current_eslint = $(shell cat package.json | sed -n 's/.*"babel-eslint": "\([^"]*\)",/\1/p')
+current_babel_eslint = $(shell cat package.json | sed -n 's/.*"eslint": "\([^"]*\)",/\1/p')
 
 SHELL = /usr/bin/env bash
+
+YELLOW=\033[0;33m
+RED=\033[0;31m
+WHITE=\033[0m
+GREEN=\u001B[32m
 
 default: build
 .PHONY: ig_backgrid test build ig_backgrid_bundle  backgrid remove_tag
@@ -21,6 +28,11 @@ test:
 	$$(npm bin)/karma start
 
 
+update_eslint:
+	@echo  -e "Current eslint is $(GREEN)$(current_eslint)$(WHITE), current babel-eslint is $(GREEN)$(current_babel_eslint)$(WHITE)" ;\
+	npm remove --save-dev eslint babel-eslint ;\
+	npm install --save-dev eslint babel-eslint
+
 
 update_version:
 ifeq ($(shell expr "${CURRENT_MAJOR}" \> "$(NEXT_MAJOR)"),1)
@@ -40,7 +52,7 @@ ifeq (${VERSION},$(v))
 endif
 	@echo "Current version is " ${VERSION}
 	@echo "Next version is " $(v)
-	sed -i s/"$(VERSION)"/"$(v)"/g package.json
+	sed -i s/'"version": "$(VERSION)"'/'"version": "$(v)"'/g package.json
 
 check_version:
 	$(eval SPLIT_VERSION = $(subst ., ,${VERSION}))
