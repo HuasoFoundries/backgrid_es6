@@ -1,7 +1,9 @@
+import cleanup from 'rollup-plugin-cleanup';
+
 export default {
   input: "./src/ig_backgrid.js",
   extend: true,
-
+  plugins: [cleanup],
   output: [{
     file: "dist/backgrid.js",
     format: "umd",
