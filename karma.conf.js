@@ -17,7 +17,7 @@ module.exports = function (config) {
       'test/vendor/underscore.js',
       'test/vendor/backbone.js',
       'dist/backgrid.js',
-      'test/*.js'
+      'test/backgrid/*.js'
     ]
 
   });
