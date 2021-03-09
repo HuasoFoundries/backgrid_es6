@@ -42,7 +42,7 @@
     "karma-mocha-reporter": "^2.2",
     "karma-phantomjs-launcher": "^1",
     "phantomjs-prebuilt": "^2.1",
-    "rollup": "^0.51.8",
+    "rollup": "^2.41.0",
     "rollup-plugin-cleanup": "^2.0.0"
   },
   "jspm": {
